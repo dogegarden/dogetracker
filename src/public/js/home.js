@@ -73,7 +73,10 @@ $(document).ready(function () {
                     
                     function changeText(text = 'Generating...') {
     
-                        element.innerHTML = "Room Status: " +  text + " (" +  (days === 0 ? "" : "Days: " + days + " | ") + "Hours: " + hours + " | Minutes: " + minutes + ")";
+                        element.innerHTML = "Room Status: " +  text + " (" +  
+                        (days === 0 ? "" : "Days: " + days + " | ") + 
+                        (hours === 0 ? "" : "Hours:" + hours + " | ")
+                         + "Minutes: " + minutes + ")";
     
                         // shortened text is 217
 
