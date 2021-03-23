@@ -75,7 +75,7 @@ $(document).ready(function () {
     
                         element.innerHTML = "Room Status: " +  text + " (" +  
                         (days === 0 ? "" : "Days: " + days + " | ") + 
-                        (hours === 0 ? "" : "Hours:" + hours + " | ")
+                        (hours === 0 ? "" : "Hours: " + hours + " | ")
                          + "Minutes: " + minutes + ")";
     
                         // shortened text is 217
