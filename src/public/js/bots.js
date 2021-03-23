@@ -16,6 +16,20 @@ $(document).ready(function () {
                     document.getElementById('botsOnline').innerHTML = payload.botAccounts.totalBotsOnline + ' Bots Online';
                 }
 
+                // bots
+
+                let bots = []
+
+                for (let i = 0; i < payload.botAccounts.botsOnline.length; i++) {
+                    bots[i] = payload.botAccounts.botsOnline[i];
+                }
+                // list bots or bot
+                document.getElementById('botsList').innerHTML = "Bot" + ((bots[i].length === 1) ? ": " : "s: ") + bots[i]
+    
+
+          
+                
+
             }
         });
     }
