@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./Components/Head', { title: 'Bots' }) %>
+    <%- include('./Components/Navbar') %>
+
+        <body>
+            <div role="main" class="container text-center cover-container d-flex h-100 p-3 mx-auto flex-column">
+                <div class="jumbotron" style="background-color: inherit">
+                    <div class="container">
+                        <h1 class="display-3">DogeTracker</h1>
+                        <br>
+                        <p>View, manage and explore statistics and historical data from <a target="_blank" href="https://dogehouse.tv">dogehouse.tv</a></p>
+                    </div>
+                </div>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm-12 col-lg-12 mb-3">
+                            <div class="card test">
+                                <div class="card-body fixed-height remove-bg moving-bg border-p ex-pink">
+                                    <div class="col-md-12" style="text-align: left;">
+                                        <a href="https://github.com/dogegarden/dogehouse-js"><button style="float: right; vertical-align: middle;" class="btn extra-btn-width btn-outline-light mr-2 mt-3">Create a Bot <i class="fas fa-plus"></i></button></a>
+
+                                        <i class="fas fa-robot fa-4x icon pr-1"></i> <strong
+                                            id="botsOnline" class="card-stat-count"><i
+                                                class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
+                                        <p class="pt-1">Provided by <a
+                                                href="https://github.com/dogegarden/dogehouse-js">dogehouse-js</a> & <a href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a>.</p>
+                                    </div>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card test">
+                                <div class="card-body fixed-height remove-bg moving-bg zoom-in ex-c border-p" style="padding-top: 30px">
+                                    <div class="col-md-6">
+                                        <i class="fas fa-users fa-3x icon pr-1"></i> <strong
+                                            id="totalServeredUsers" class="card-stat-count"><i
+                                                class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
+                                        <p class="pt-1 p-text"> total servered user<span id="roomFix"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <i class="fas fa-satellite-dish fa-3x icon pr-1"></i> <strong
+                                            id="totalBotsSendingTelemetry" class="card-stat-count"><i
+                                                class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
+                                        <p class="pr-1 p-text"> bots sending telemetry</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card test">
+                                <div class="card-body fixed-height remove-bg moving-bg zoom-in ex-c border-p">
+                                    <div class="col-md-12">
+                                        <div style="display: flex; align-items: center; place-content: center">
+                                        <i class="fas fa-fire fa-3x icon pr-2"></i><strong class="card-stat-count"> Trending Bot</strong></div><br>
+                                        <p>
+                                        <strong id="trendingBotName">
+                                        <a id="topRoomLink" target="_blank" href="dogehouse.tv/rooms/idgoeshere"></a>
+                                        <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
+                                        </strong> 
+                                        serving
+                                        <strong id="trendingBotCount"><i class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span id="trendingBotCountFix">s</span>. <br><span id="timeOnline">Gathering Time...</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">Bots Online</div>
+                                <div class="card-body">
+                                    <canvas id="botsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">Amount of Rooms Bots are in</div>
+                                <div class="card-body">
+                                    <canvas id="roomBotsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card test">
+                            <div class="card-body fixed-height remove-bg moving-bg stats-hover zoom-in ex-blue border-b">
+                                <div class="col-md-12">
+                                    <div style="display: flex; align-items: center; place-content: center">
+                                    <i class="fas fa-plus-circle fa-3x icon pr-2"></i><strong class="card-stat-count"> Newest Room</strong></div><br>
+                                    <p>
+                                    <strong id="newestRoom">
+                                    <a id="newestRoomLink" target="_blank" href="dogehouse.tv/rooms/idgoeshere"></a>
+                                    <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
+                                    </strong> 
+                                    containing
+                                    <strong id="newestUserCount"><i class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span id="newestUserFix">s</span>. <br><span id="newestTimeOnline">Gathering Time...</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card test">
+                            <div class="card-body fixed-height remove-bg moving-bg stats-hover zoom-in ex-orange border-o">
+                                <div class="col-md-12">
+                                    <div style="display: flex; align-items: center; place-content: center">
+                                    <i class="fas fa-history fa-3x icon pr-2"></i><strong class="card-stat-count"> Longest Active Room</strong></div><br>
+                                    <p>
+                                    <strong id="longestRoom">
+                                    <a id="longestRoomLink" target="_blank" href="dogehouse.tv/rooms/idgoeshere"></a>
+                                    <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
+                                    </strong> 
+                                    containing
+                                    <strong id="longestUserCount"><i class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span id="longestUserFix">s</span>. <br><span id="longestTimeOnline">Gathering Time...</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br>
+            </div>
+
+            <%- include('./Components/Footer') %>
+
+
+                <script src="../public/js/bots.js"></script>
+                <script src="../public/js/statistics.js"></script>
+                <script src="../public/js/utils.js"></script>
+        </body>
