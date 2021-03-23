@@ -21,7 +21,7 @@ $(document).ready(function () {
                 let bots = []
 
                 for (let i = 0; i < payload.botAccounts.botsOnline.length; i++) {
-                    bots[i] = payload.botAccounts.botsOnline[i];
+                    bots[i] = payload.botAccounts.botsOnline[i].bot.username;
                 }
                 // list bots or bot
                 document.getElementById('botsList').innerHTML = "Bot" + ((bots[i].length === 1) ? ": " : "s: ") + bots[i]
