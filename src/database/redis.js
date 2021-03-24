@@ -2,7 +2,7 @@
 
 const Redis = require('ioredis');
 const Logger = require('../util/Logger')
-const axios = require('axios')
+// const axios = require('axios')
 require('dotenv').config()
 
 Logger.reddis('Connected to reddis.')

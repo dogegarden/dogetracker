@@ -2722,7 +2722,7 @@ fieldset:disabled a.btn {
 
 .btn-secondary {
 	color: #fff;
-	background-color: #6c757d;
+	background-color: #33404d;
 	border-color: #6c757d
 }
 
@@ -3420,7 +3420,7 @@ input[type=submit].btn-block {
 	color: #212529;
 	text-align: left;
 	list-style: none;
-	background-color: #fff;
+    background-color: rgba(31.008, 40.8, 50.592, var(--tw-bg-opacity));
 	background-clip: padding-box;
 	border: 1px solid rgba(0, 0, 0, .15);
 	border-radius: .25rem
@@ -3598,7 +3598,7 @@ input[type=submit].btn-block {
 .dropdown-item:hover {
 	color: #16181b;
 	text-decoration: none;
-	background-color: #f8f9fa
+	background-color: #33404d;
 }
 
 .dropdown-item.active,

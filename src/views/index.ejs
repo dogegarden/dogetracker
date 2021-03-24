@@ -25,13 +25,12 @@
                     <div class="container">
                         <h1 class="display-3">DogeTracker</h1>
                         <br>
-                        <p>View, manage and explore statistics and historical data from <a target="_blank"
-                                href="dogehouse.tv">dogehouse.tv</a></p>
+                        <p>View, manage and explore statistics and historical data from <a target="_blank"href="dogehouse.tv">dogehouse.tv</a><br>Made possible by <a href="https://github.com/dogegarden/dogehouse-js">dogehouse-js</a> & <a href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a></p>
                     </div>
                 </div>
 
                 <div class="container">
-                    <div class="alert alert-danger alert-dismissible fade show fade-in" role="alert">
+                    <!-- <div class="alert alert-danger alert-dismissible fade show fade-in" role="alert">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
@@ -41,7 +40,7 @@
                         <p class="mb-0">You can read more about this at <a
                                 href="https://github.com/benawad/dogehouse/issues/1135">this GitHub issue</a>
                         </p>
-                    </div>
+                    </div> -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card test">
@@ -92,7 +91,24 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card">
-                                <div class="card-header">User Activity</div>
+                                <div class="card-header">User Activity                                
+                                    <div class="btn-group pl-2" role="group" aria-label="Button group with nested dropdown">
+                                     <div class="btn-group" role="group">
+                                      <button id="userActivityChartTimeframe" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        24h
+                                      </button>
+                                      <div class="dropdown-menu" aria-labelledby="userActivityChartTimeframe">
+                                        <hr>
+                                        <a class="dropdown-item"><strong>Coming Soon</strong></a>
+                                        <hr>
+                                        <a class="dropdown-item" onclick="dropdownUpdate('24h', this);">24h</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate('week', this);">Week</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate('month', this);">Month</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate('alltime', this);">All Time</a>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
                                 <div class="card-body">
                                     <canvas id="statsChart"></canvas>
                                 </div>
@@ -100,7 +116,24 @@
                         </div>
                         <div class="col-md-6">
                             <div class="card">
-                                <div class="card-header">Room Activity</div>
+                                <div class="card-header">Room Activity
+                                <div class="btn-group pl-2" role="group" aria-label="Button group with nested dropdown">
+                                    <div class="btn-group" role="group">
+                                     <button id="roomActivityChartTimeframe" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                       24h
+                                     </button>
+                                     <div class="dropdown-menu" aria-labelledby="roomActivityChartTimeframe">
+                                         <hr>
+                                        <a class="dropdown-item"><strong>Coming Soon</strong></a>
+                                        <hr>
+                                        <a class="dropdown-item" onclick="dropdownUpdate('24h', this);">24h</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate('week', this);">Week</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate('month', this);">Month</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate('alltime', this);">All Time</a>
+                                     </div>
+                                   </div>
+                                 </div>
+                                </div>
                                 <div class="card-body">
                                     <canvas id="roomsChart"></canvas>
                                 </div>
@@ -119,8 +152,7 @@
                                         <i class="fas fa-robot fa-4x icon pr-1"></i> <strong
                                             id="botsOnline" class="card-stat-count"><i
                                                 class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
-                                        <p class="pt-1">Provided by <a
-                                                href="https://github.com/dogegarden/dogehouse-js">dogehouse-js</a> & <a href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a>.</p>
+                                        <p class="pt-1">Provided by <a href="https://github.com/dogegarden/dogehouse.js">dogehouse.js</a> & <a href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a>.</p>
                                     </div>
                                     </p>
                                 </div>
@@ -161,6 +193,21 @@
                                     <strong id="longestUserCount"><i class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span id="longestUserFix">s</span>. <br><span id="longestTimeOnline">Gathering Time...</span>
                                     </p>
                                 </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-lg-12 mb-3 m-3">
+                        <div class="card test">
+                            <div class="card-body border-p ex-c">
+                                <div class="col-md-12" id="testBots style="text-align: left;">
+                                    <div style="display: flex; align-items: center; place-content: center">
+                                        <i class="fas fa-robot fa-3x icon pr-2"></i><strong class="card-stat-count"> Online Bot List</strong></div>
+                                    <p id="botsProvidingTelem" class="pt-1"><i class="fas fa-spinner fa-w-16 fa-spin"></i></p>
+                                        <div id="testBots"></div>
+                                    </div>
+                                </p>
                             </div>
                         </div>
                     </div>
