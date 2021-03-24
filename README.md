@@ -3,7 +3,7 @@
   <img src="https://cdn.discordapp.com/attachments/820450983892222022/820961073980899328/dogegarden-bottom-cropped.png" alt="DogeGarden logo" />
 </p>
 <p align="center">
-  <strong>An open-source website for viewing, managing and exploring statistics and historical data from DogeHouse. 🐶</strong>
+  <strong>An open-source website for viewing, managing and exploring statistics and historical data from DogeHouse 🐶</strong>
 </p>
 <p align="center">
   <a href="https://discord.gg/Nu6KVjJYj6">
@@ -25,7 +25,14 @@
 
 ## Installation
 
-- todo. good pr.
+- You need a MongoDB and Redis database setup. You can get them for free from MongoDB Atlas & RedisLabs.
+
+1. git clone https://github.com/dogegarden/dogegarden-stats
+2. Install [NodeJS](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/).
+3. Install depends: `npm install --save`
+4. Fill out example.env
+5. Run index.js
+
 
 ## Credits
 
