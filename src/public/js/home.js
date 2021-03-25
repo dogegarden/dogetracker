@@ -1,7 +1,16 @@
-
-
-
 $(document).ready(function () {
+
+    function dropdownUpdate(value, element){
+        if (element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartTimeframe') {
+            console.log(1)
+        } else if (element.parentElement.getAttribute('aria-labelledby') == 'roomActivityChartTimeframe') {
+            console.log(2)
+        } else {
+            console.log(`Dropdown parent ID not in logic`);
+        }
+    }
+    
+
     function update() {
         $.ajax({
             url: '/api/statistics',
@@ -28,13 +37,14 @@ $(document).ready(function () {
                 document.getElementById('newestRoom').innerHTML = payload.newestRoom.name;
                 document.getElementById('newestUserCount').innerHTML = payload.newestRoom.listeners;
                 document.getElementById('newestUserFix').innerText = (payload.newestRoom.listeners == 1) ? '' : 's';
+                document.getElementById('botsProvidingTelem').innerText = payload.totalBotsSendingTelemetry + ' bots providing telemrtry'
 
-                if (payload.botAccounts.totalBotsOnline == 1) {
-                    document.getElementById('botsOnline').innerHTML = payload.botAccounts.totalBotsOnline + ' Bot Online';
-                } else if (payload.botAccounts.totalBotsOnline == 0) {
+                if (payload.totalBotsOnline == 1) {
+                    document.getElementById('botsOnline').innerHTML = payload.totalBotsOnline + ' Bot Online';
+                } else if (payload.totalBotsOnline == 0) {
                     document.getElementById('botsOnline').innerHTML = 'No bots online :(';
                 } else {
-                    document.getElementById('botsOnline').innerHTML = payload.botAccounts.totalBotsOnline + ' Bots Online';
+                    document.getElementById('botsOnline').innerHTML = payload.totalBotsOnline + ' Bots Online';
                 }
 
 
@@ -135,6 +145,9 @@ $(document).ready(function () {
                         'step' : 0,
                         'limit' : 100
                     }
+                    window.chartData = {
+                        'datasets': [0,1,2]
+                    };
                 };
 
                 // User Acitivty Chart
@@ -169,9 +182,52 @@ $(document).ready(function () {
 
             }
         });
+        $.ajax({
+            url: '/api/bots',
+            success: (payload) => {
+                // console.log(payload)
+                for (i=0; i < payload.bots.length; i++) {
+                    var botExists = false;
+                    if (document.getElementById("testBots").innerText.indexOf(payload.bots[i].bot.uuid) == -1) {
+                        document.getElementById('testBots').innerHTML += 
+                        `<a target="_blank" href="">
+                        <div class="card accounts-card">
+                            <div class="card-body border-r">
+                                <div class="con-grid1">
+                                    <img class="account-avatar" src="https://avatars.githubusercontent.com/u/80551136?s=280&v=4">
+                                    <div class="account-text" style="line-height: 15px; text-align: left;">
+                                    ${payload.bots[i].bot.username}<br>
+                                        <span class="uuid" style="font-size: 10px; --tw-text-opacity: 1; color: rgba(154.148,165.363,177.352,var(--tw-text-opacity));">${payload.bots[i].bot.uuid}</span>
+                                        <i style="font-size: 1rem; display: block;">${payload.bots[i].room.name}</i>
+
+                                        </div>
+
+                                    <div class="right-col-rooms">
+                                      <i class="fas fa-user-friends" aria-hidden="true"></i> ${payload.bots[i].room.listening}
+                                    </div>
+                                </div>
+                                <br><br>
+                            </div>
+                        </div>
+                    </a><br>`
+                    }
+                    for (let j=0; j < payload.bots.length; j++) {
+                        if (payload.bots[i].bot.uuid == document.getElementsByClassName("uuid")[j].innerText) {
+                            botExists = true;
+                            document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[2].innerHTML = `<i class="fas fa-user-friends" aria-hidden="true"></i> `+ payload.bots[i].room.listening;
+                            document.getElementsByClassName("uuid")[j].parentElement.children[2].innerText = payload.bots[i].room.name;
+                        }
+                    }
+                    if (i == (payload.bots.length -1) && botExists == false) {
+                        // console.log(`Remove Bot`);
+                        document.getElementById('testBots').children[i].remove();
+                        document.getElementById('testBots').children[i].remove();
+                    }
+                }
+            }        
+        })
     }
 
     update();
     setInterval(update, 5000);
 });
-// s3ansh33p - nothing sus

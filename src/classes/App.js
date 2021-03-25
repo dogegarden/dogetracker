@@ -99,6 +99,12 @@ class App {
         //     })
         // })
 
+        // this.app.get('/bots', function(req, res) {
+        //     res.render('bots.ejs', {
+        //         path: req.path,
+        //     })
+        // })
+
     } // end listener
 
     

@@ -4,68 +4,12 @@ const { createClient } = require('../database/redis');
 const roomsClient = createClient(`rooms`);
 const usersClient = createClient(`users`);
 
-// let redisCounter = 0;
-// // redisMax * api time (seconds) for delay between each update to database
-// // e.g redisMax = 30, api time = 10, = 300 second delay / 5 minutes.
-// let redisMax = 30;
-
 class API extends Router {
     constructor(client) {
         super(client, '/api');
     }
     createRoute() {
 
-        this.router.get('/rooms', async (req, res) => {
-            try {
-                axios.get('https://api.dogehouse.xyz/v1/popularRooms?dogestats')
-                .then(async function (response) {
-
-                    res.json(response.data);
-
-                    const { rooms } = response.data;
-
-                    const multi = roomsClient.multi();
-                    const now = Date.now();
-
-                    for ( let i = 0; i < rooms.length; ++i ) {
-                        let room = rooms[ i ];
-
-                        const data = {
-                            [`name`]: room.name,
-                            [`description`]: room.description,
-                            [`inserted_at`]: room.inserted_at,
-                            [`creatorId`]: room.creatorId,
-                            [`isPrivate`]: room.isPrivate,
-                        };
-                        // if (redisCounter >= redisMax) {
-                        //     // Counter for long term data
-                        //     const countKey = `${room.id}:count:${now}`;
-                        //     const usersKey = `${room.id}:users:${now}`;
-                        //     multi.sadd(countKey, room.numPeopleInside);
-                        //     multi.sadd(usersKey, room.peoplePreviewList.map(({ id }) => id));
-                        // }
-
-                    }
-                    // console.log(`redisCounter ${redisCounter} / redisMax ${redisMax}`)
-                    // if (redisCounter >= redisMax) {
-                    //     // Counter for long term data
-                    //     const redisResult = await multi.exec();
-                    //     console.log(`by ID: meta - `, redisResult[0][1]);
-                    //     console.log(`by ID: count - `, redisResult[1][1]);
-                    //     console.log(`by ID: users - `, redisResult[2][1]);
-                    //     redisCounter = 0;
-                    // } else {
-                    //     redisCounter++;
-                    // }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                })
-            } catch (e) {
-                return res.redirect('/panel/settings?err=An error occurred.')
-            }
-        })
- 
         this.router.get('/statistics', async (req, res) => {
             try {
                 let statistics = await axios.get('https://api.dogehouse.xyz/v1/statistics?dogestats')
@@ -100,9 +44,8 @@ class API extends Router {
                             id: longestRoom.id,
                             created_at: longestRoom.inserted_at
                         },
-                        botAccounts: {
-                            totalBotsOnline: statistics.data.botAccounts.totalBotsOnline
-                        },
+                        totalBotsOnline: statistics.data.totalBotsOnline,
+                        totalBotsSendingTelemetry: statistics.data.totalBotsSendingTelemetry,
                         id: statistics.data.pid,
                         serverTime: serverTime
                     }

@@ -228,7 +228,6 @@ $(document).ready(function(){
 
     //     var ctxOutages = document.getElementById('outageChart').getContext('2d');
     //     window.chartOutages = new Chart(ctxOutages, config);
-    // // s3ansh33p - nothing sus
 
 
   });

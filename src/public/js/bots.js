@@ -1,117 +1,175 @@
-
-
-
 $(document).ready(function () {
+    // Chart Setup
+
+    var labels = [];
+    var config = {
+        type: 'line',
+        data: {
+            
+            labels: labels,
+            datasets: [{
+                label: 'Bots',
+                backgroundColor: 'rgba(244, 5, 95, 0.55)',
+                borderColor: '#f4055f',
+                data: [],
+                fill: true,
+                lineTension: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            bezierCurve: false,
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            },
+            animation: {
+                duration: 0  
+            },
+            legend: {
+                display: false
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            tooltips: {
+                callbacks: {
+                   title: function(t, d) {
+                      return "Time: "+d.labels[t[0].index]+" seconds";
+                   }
+                }
+             },
+             
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Seconds',
+                        fontColor: '#cacaca'
+                    },
+                    ticks: {
+                        fontColor: '#cacaca'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Online Bots',
+                        fontColor: '#cacaca'
+                    },
+                    ticks: {
+                        suggestedMin: 0,
+                        suggestedMax: 20,
+                        fontColor: '#cacaca'
+                    }
+                }]
+            }
+        }
+    };
+
+        var ctx = document.getElementById('botsChart').getContext('2d');
+        window.chart = new Chart(ctx, config);
+
+        // Rooms
+        var labelsRooms = [];
+    var config = {
+        type: 'line',
+        data: {
+            labels: labelsRooms,
+            datasets: [{
+                label: 'Rooms',
+                backgroundColor: 'rgba(244, 5, 95, 0.55)',
+                borderColor: '#f4055f',
+                data: [],
+                fill: true,
+                lineTension: 0,
+            }]
+        },
+        options: {
+            responsive: true,
+            bezierCurve: false,
+            tooltips: {
+                mode: 'index',
+                intersect: false,
+            },
+            elements: {
+                point: {
+                    radius: 0
+                }
+            },
+            animation: {
+                duration: 0  
+            },
+            legend: {
+                display: false
+            },
+            hover: {
+                mode: 'nearest',
+                intersect: true
+            },
+            tooltips: {
+                callbacks: {
+                   title: function(t, d) {
+                      return "Time: "+d.labels[t[0].index]+" seconds";
+                   }
+                }
+             },
+            scales: {
+                xAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Seconds',
+                        fontColor: '#cacaca'
+                    },
+                    ticks: {
+                        fontColor: '#cacaca'
+                    }
+                }],
+                yAxes: [{
+                    display: true,
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'Public Rooms',
+                        fontColor: '#cacaca'
+                    },
+                    ticks: {
+                        suggestedMin: 0,
+                        suggestedMax: 10,
+                        fontColor: '#cacaca'
+                    }
+                }]
+            }
+        }
+    };
+
+        var ctxRooms = document.getElementById('roomBotsChart').getContext('2d');
+        window.chartRooms = new Chart(ctxRooms, config);
+
+
+
     function update() {
         $.ajax({
-            url: '/api/bots',
+            url: '/api/statistics',
             success: (payload) => {
                 console.log(payload)
-                // Total Rooms
-                document.getElementById('totalServeredUsers').innerHTML = payload.botAccounts.room.map(it => it.listening).reduce((a, b) => a + b, 0);
-                document.getElementById('totalBotsSendingTelemetry').innerHTML = payload.totalBots;
-
-                if (payload.botAccounts.totalBotsOnline == 1) {
-                    document.getElementById('botsOnline').innerHTML = payload.botAccounts.totalBotsOnline + ' Bot Online';
-                } else if (payload.botAccounts.totalBotsOnline == 0) {
+                if (payload.totalBots == 1) {
+                    document.getElementById('botsOnline').innerHTML = payload.totalBots + ' Bot Online';
+                } else if (payload.totalBots == 0) {
                     document.getElementById('botsOnline').innerHTML = 'No bots online :(';
                 } else {
-                    document.getElementById('botsOnline').innerHTML = payload.botAccounts.totalBotsOnline + ' Bots Online';
+                    document.getElementById('botsOnline').innerHTML = payload.totalBots + ' Bots Online';
                 }
-
-
-                // Get room status 
-                function getStatus(element, payloadCreation) {
-                   
-                    let currentTime = new Date().valueOf() 
-                    // let serverOffset = (1000*60*60*-12)
-                    let roomCreation = new Date(payloadCreation).valueOf();
-                    // let timeDiff = (currentTime - roomCreation - serverOffset) / (1000 * 60) ; // minutes
-                    let timeDiff = (currentTime - roomCreation) / (1000 * 60) ; // minutes
-
-                    // let timeDiffHours = timeDiff / 60
-                    // let shortenedText = ~~timeDiffHours;
-
-
-
-                    // shortenedText === 24 ? shortenedText = 0 :  console.log(shortenedText)
-
-                    
-
-                    // let minutes = ~~((timeDiffHours - ~~timeDiffHours) * 60)
-                    // let days = 0;
-                    // if (timeDiffHours > 23) {
-                    //     days = ~~(timeDiff / 60 / 24);
-                    // }
-                    // let hours = shortenedText - days * 24;
-
-                    let days = ~~(timeDiff/60/24)
-                    let minutes = ~~(timeDiff%60)
-                    let hours = ~~(timeDiff/60%24)
-
-                    
-                    
-                
-                    
-                    function changeText(text = 'Generating...') {
-    
-                        element.innerHTML = "Room Status: " +  text + " (" +  (days === 0 ? "" : "Days: " + days + " | ") + "Hours: " + hours + " | Minutes: " + minutes + ")";
-    
-                        // shortened text is 217
-
-                    }
-
-                    switch (true) {
-
-                        case (timeDiff < 30): {
-                            changeText("⛽️ Fueling Rocket")
-                            break;
-                        }
-                        case (timeDiff < 60): {
-                            changeText("🚀 Taking Off")
-                            break;
-                        }
-                        case (timeDiff < 240): {
-                            changeText("🚀✨ In Space")
-                            break;
-                        }
-                        case (timeDiff < 480): {
-                            changeText("🚀🌕 Approaching Moon")
-                            break;
-                        }
-                        case (timeDiff < 1440): {
-                            changeText("🌕🐕 Lunar Doge")
-                            break;
-                        }
-                        case (timeDiff < 2880): {
-                            changeText("🚀☀️ Approaching Sun")
-                            break;
-                        }
-                        case (timeDiff < 5760): {
-                            changeText("☀️🐕 Solar Doge")
-                            break;
-                        }
-                        case (timeDiff < 11520): {
-                            changeText("🚀🌌 Approaching Galaxy")
-                            break;
-                        }
-                        case (timeDiff < 23040): {
-                            changeText("🌌🐕 Galatic Doge")
-                            break;
-                        }
-                        case (timeDiff < 23041): {
-                            changeText("🪐👾 Spotted Life")
-                            break;
-                        }
-                    }
-
-                }
-                getStatus(document.getElementById('timeOnline'), payload.topRoom.created_at)
-                getStatus(document.getElementById('newestTimeOnline'), payload.newestRoom.created_at)
-                getStatus(document.getElementById('longestTimeOnline'), payload.longestRoom.created_at)
-
-                // Set start date for client
-                if (window.chartConfig == undefined) {
+                    // Set start date for client
+                    if (window.chartConfig == undefined) {
                     window.chartConfig = {
                         'start' : new Date().valueOf(),
                         'step' : 0,
@@ -124,7 +182,7 @@ $(document).ready(function () {
                 window.chart.config.data.labels.push(time);
                 window.chartConfig.step++;
                 window.chart.config.data.datasets.forEach(function (dataset) {
-                    dataset.data.push(payload.totalOnline);
+                    dataset.data.push(payload.totalBots);
                 });
                 // Check if datapoints need to be removed
                 // if (window.chart.data.datasets[0].data.length > 20) {
@@ -156,4 +214,3 @@ $(document).ready(function () {
     update();
     setInterval(update, 5000);
 });
-// s3ansh33p - nothing sus
