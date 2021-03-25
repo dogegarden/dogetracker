@@ -8,39 +8,38 @@ $(document).ready(function () {
             success: (payload) => {
                 // console.log(payload)
                 // Total Rooms
-                document.getElementById('roomCount').innerHTML = payload.totalRooms;
-                document.getElementById('roomFix').innerText = (payload.totalRooms == 1) ? '' : 's';
+                $('#roomCount').html(payload.totalRooms);
+                $('#roomFix').html((payload.totalRooms == 1) ? '' : 's');
                 // Total Online People in all Rooms
-                document.getElementById('userCount').innerHTML = payload.totalOnline;
+                $('#userCount').html(payload.totalOnline);
                 // Scheduled Rooms Count
-                document.getElementById('scheduledCount').innerHTML = payload.totalScheduled;
-                document.getElementById('scheduledFix').innerText = (payload.totalScheduled == 1) ? '' : 's';
+                $('#scheduledCount').html(payload.totalScheduled);
+                $('#scheduledFix').html((payload.totalScheduled == 1) ? '' : 's');
                 // Largest Room Name
-                document.getElementById('topRoomName').innerHTML = payload.topRoom.name;
-                document.getElementById('topUserFix').innerText = (payload.topRoom.listeners == 1) ? '' : 's';
+                $('#topRoomName').html(payload.topRoom.name);
+                $('#topUserFix').html((payload.topRoom.listeners == 1) ? '' : 's');
                 // Largest Room Listners
-                document.getElementById('topUserCount').innerHTML = payload.topRoom.listeners;
+                $('#topUserCount').html(payload.topRoom.listeners);
                 // Longest Room
-                document.getElementById('longestRoom').innerHTML = payload.longestRoom.name;
-                document.getElementById('longestUserCount').innerHTML = payload.longestRoom.listeners;
-                document.getElementById('longestUserFix').innerText = (payload.longestRoom.listeners == 1) ? '' : 's';
+                $('#longestRoom').html(payload.longestRoom.name);
+                $('#longestUserCount').html(payload.longestRoom.listeners);
+                $('#longestUserFix').html((payload.longestRoom.listeners == 1) ? '' : 's');
                 // Newest Room
-                document.getElementById('newestRoom').innerHTML = payload.newestRoom.name;
-                document.getElementById('newestUserCount').innerHTML = payload.newestRoom.listeners;
-                document.getElementById('newestUserFix').innerText = (payload.newestRoom.listeners == 1) ? '' : 's';
+                $('#newestRoom').html(payload.newestRoom.name);
+                $('#newestUserCount').html(payload.newestRoom.listeners);
+                $('#newestUserFix').html((payload.newestRoom.listeners == 1) ? '' : 's');
 
                 if (payload.botAccounts.totalBotsOnline == 1) {
-                    document.getElementById('botsOnline').innerHTML = payload.botAccounts.totalBotsOnline + ' Bot Online';
+                    $('botsOnline').html(payload.botAccounts.totalBotsOnline + ' Bot Online');
                 } else if (payload.botAccounts.totalBotsOnline == 0) {
-                    document.getElementById('botsOnline').innerHTML = 'No bots online :(';
+                    $('botsOnline').html('No bots online :(');
                 } else {
-                    document.getElementById('botsOnline').innerHTML = payload.botAccounts.totalBotsOnline + ' Bots Online';
+                    $('botsOnline').html(payload.botAccounts.totalBotsOnline + ' Bots Online');
                 }
 
 
                 // Get room status 
                 function getStatus(element, payloadCreation) {
-                   
                     let currentTime = new Date().valueOf() 
                     // let serverOffset = (1000*60*60*-12)
                     let roomCreation = new Date(payloadCreation).valueOf();
@@ -124,9 +123,9 @@ $(document).ready(function () {
                     }
 
                 }
-                getStatus(document.getElementById('timeOnline'), payload.topRoom.created_at)
-                getStatus(document.getElementById('newestTimeOnline'), payload.newestRoom.created_at)
-                getStatus(document.getElementById('longestTimeOnline'), payload.longestRoom.created_at)
+                getStatus($('#timeOnline'), payload.topRoom.created_at)
+                getStatus($('#newestTimeOnline'), payload.newestRoom.created_at)
+                getStatus($('#longestTimeOnline'), payload.longestRoom.created_at)
 
                 // Set start date for client
                 if (window.chartConfig == undefined) {
