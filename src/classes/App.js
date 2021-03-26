@@ -10,6 +10,7 @@ const axios = require('axios')
 const Calls = require('../database/mongo')
 require('dotenv').config()
 
+
 const {
     test: testRedis
 } = require('../database/redis');
@@ -36,7 +37,7 @@ class App {
 
     async registerRoutes() {
 
-    const filePath = path.join(__dirname, '..', 'routes');
+        const filePath = path.join(__dirname, '..', 'routes');
         const files = await fs.readdir(filePath);
         for await (const file of files) {
             if (file.endsWith('.js')) {
@@ -55,7 +56,7 @@ class App {
 
         // routes below...
 
-        this.app.get('/', function(req, res) {
+        this.app.get('/', function (req, res) {
             res.render('index.ejs', {
                 path: req.path,
             })
@@ -67,7 +68,7 @@ class App {
         //     })
         // })
 
-        this.app.get('/rooms', async function(req, res) {
+        this.app.get('/rooms', async function (req, res) {
             try {
                 const rooms = await axios.get('https://api.dogehouse.xyz/v1/popularRooms');
                 console.log(rooms.data.rooms)
@@ -75,9 +76,9 @@ class App {
                     path: req.path,
                     rooms: rooms.data.rooms
                 })
-        } catch(err) {
-            console.log(err)
-        }
+            } catch (err) {
+                console.log(err)
+            }
         })
 
         // this.app.get('/scheduled', async function(req, res) {
@@ -107,12 +108,12 @@ class App {
 
     } // end listener
 
-    
+
 
     async listen(fn) {
         this.server.listen(process.env.EXPRESS_PORT, fn);
     }
-    
+
 }
 
 module.exports = App;

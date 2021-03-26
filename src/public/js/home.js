@@ -1,15 +1,13 @@
-$(document).ready(function () {
+function dropdownUpdate(value, element) {
+    document.getElementById(element.parentElement.getAttribute('aria-labelledby')).innerText = value;
+    changeDataset(((element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartTimeframe') ? 'statsChart' : 'roomsChart'), value)
+}
 
-    function dropdownUpdate(value, element){
-        if (element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartTimeframe') {
-            console.log(1)
-        } else if (element.parentElement.getAttribute('aria-labelledby') == 'roomActivityChartTimeframe') {
-            console.log(2)
-        } else {
-            console.log(`Dropdown parent ID not in logic`);
-        }
-    }
-    
+function changeDataset(canvasID, value) {
+    console.log(`Canvas ${canvasID} | value ${value}`)
+}
+
+$(document).ready(function () {
 
     function update() {
         $.ajax({
@@ -37,7 +35,7 @@ $(document).ready(function () {
                 document.getElementById('newestRoom').innerHTML = payload.newestRoom.name;
                 document.getElementById('newestUserCount').innerHTML = payload.newestRoom.listeners;
                 document.getElementById('newestUserFix').innerText = (payload.newestRoom.listeners == 1) ? '' : 's';
-                document.getElementById('botsProvidingTelem').innerText = payload.totalBotsSendingTelemetry + ' bots providing telemrtry'
+                document.getElementById('botsProvidingTelem').innerText = payload.totalBotsSendingTelemetry + ' bots providing telemetry'
 
                 if (payload.totalBotsOnline == 1) {
                     document.getElementById('botsOnline').innerHTML = payload.totalBotsOnline + ' Bot Online';
@@ -50,12 +48,12 @@ $(document).ready(function () {
 
                 // Get room status 
                 function getStatus(element, payloadCreation) {
-                   
-                    let currentTime = new Date().valueOf() 
+
+                    let currentTime = new Date().valueOf()
                     // let serverOffset = (1000*60*60*-12)
                     let roomCreation = new Date(payloadCreation).valueOf();
                     // let timeDiff = (currentTime - roomCreation - serverOffset) / (1000 * 60) ; // minutes
-                    let timeDiff = (currentTime - roomCreation) / (1000 * 60) ; // minutes
+                    let timeDiff = (currentTime - roomCreation) / (1000 * 60); // minutes
 
                     // let timeDiffHours = timeDiff / 60
                     // let shortenedText = ~~timeDiffHours;
@@ -64,7 +62,7 @@ $(document).ready(function () {
 
                     // shortenedText === 24 ? shortenedText = 0 :  console.log(shortenedText)
 
-                    
+
 
                     // let minutes = ~~((timeDiffHours - ~~timeDiffHours) * 60)
                     // let days = 0;
@@ -73,18 +71,18 @@ $(document).ready(function () {
                     // }
                     // let hours = shortenedText - days * 24;
 
-                    let days = ~~(timeDiff/60/24)
-                    let minutes = ~~(timeDiff%60)
-                    let hours = ~~(timeDiff/60%24)
+                    let days = ~~(timeDiff / 60 / 24)
+                    let minutes = ~~(timeDiff % 60)
+                    let hours = ~~(timeDiff / 60 % 24)
 
-                    
-                    
-                
-                    
+
+
+
+
                     function changeText(text = 'Generating...') {
-    
-                        element.innerHTML = "Room Status: " +  text + " (" +  (days === 0 ? "" : "Days: " + days + " | ") + "Hours: " + hours + " | Minutes: " + minutes + ")";
-    
+
+                        element.innerHTML = "Room Status: " + text + " (" + (days === 0 ? "" : "Days: " + days + " | ") + "Hours: " + hours + " | Minutes: " + minutes + ")";
+
                         // shortened text is 217
 
                     }
@@ -141,12 +139,12 @@ $(document).ready(function () {
                 // Set start date for client
                 if (window.chartConfig == undefined) {
                     window.chartConfig = {
-                        'start' : new Date().valueOf(),
-                        'step' : 0,
-                        'limit' : 100
+                        'start': new Date().valueOf(),
+                        'step': 0,
+                        'limit': 100
                     }
                     window.chartData = {
-                        'datasets': [0,1,2]
+                        'datasets': [0, 1, 2]
                     };
                 };
 
@@ -162,14 +160,14 @@ $(document).ready(function () {
                 //     // window.chart.data.datasets[0].data = window.chart.data.datasets[0].data.slice(1);
                 //     // window.chart.data.labels = window.chart.data.labels.slice(1);
                 // }
-                    // window.chart.options.scales.xAxes[0].scaleLabel.labelString = "Minutes"
-                    // window.chartRooms.options.scales.xAxes[0].scaleLabel.labelString = "Minutes"
-                    if (window.chart.data.datasets[0].data.length >= window.chartConfig.limit) {
-                        window.chart.data.datasets[0].data = window.chart.data.datasets[0].data.slice(1);
-                        window.chart.data.labels = window.chart.data.labels.slice(1);
-                        window.chartRooms.data.datasets[0].data = window.chartRooms.data.datasets[0].data.slice(1);
-                        window.chartRooms.data.labels = window.chartRooms.data.labels.slice(1);
-                    }
+                // window.chart.options.scales.xAxes[0].scaleLabel.labelString = "Minutes"
+                // window.chartRooms.options.scales.xAxes[0].scaleLabel.labelString = "Minutes"
+                if (window.chart.data.datasets[0].data.length >= window.chartConfig.limit) {
+                    window.chart.data.datasets[0].data = window.chart.data.datasets[0].data.slice(1);
+                    window.chart.data.labels = window.chart.data.labels.slice(1);
+                    window.chartRooms.data.datasets[0].data = window.chartRooms.data.datasets[0].data.slice(1);
+                    window.chartRooms.data.labels = window.chartRooms.data.labels.slice(1);
+                }
 
                 // Room Acitivty Chart
                 window.chartRooms.config.data.labels.push(time);
@@ -186,24 +184,35 @@ $(document).ready(function () {
             url: '/api/bots',
             success: (payload) => {
                 // console.log(payload)
-                for (i=0; i < payload.bots.length; i++) {
+                let uniqueBots = [];
+                for (let i = 0; i < payload.bots.length; i++) {
+                    if (payload.bots[i].bot != undefined) {
+                        uniqueBots.push(payload.bots[i]);
+                    }
+                }
+                // console.log(uniqueBots)
+                if (document.getElementsByClassName("uuid").length > uniqueBots.length) {
+                    // Remove all for now
+                    document.getElementById('testBots').innerHTML = "";
+                }
+                for (i = 0; i < uniqueBots.length; i++) {
                     var botExists = false;
-                    if (document.getElementById("testBots").innerText.indexOf(payload.bots[i].bot.uuid) == -1) {
-                        document.getElementById('testBots').innerHTML += 
-                        `<a target="_blank" href="">
+                    if (document.getElementById("testBots").innerText.indexOf(uniqueBots[i].bot.uuid) == -1) {
+                        document.getElementById('testBots').innerHTML +=
+                            `<a target="_blank"${(uniqueBots[i].room.uuid == null) ? '' : ' href="https://dogehouse.tv/room/' + uniqueBots[i].room.uuid + '"'}>
                         <div class="card accounts-card">
                             <div class="card-body border-r">
                                 <div class="con-grid1">
                                     <img class="account-avatar" src="https://avatars.githubusercontent.com/u/80551136?s=280&v=4">
                                     <div class="account-text" style="line-height: 15px; text-align: left;">
-                                    ${payload.bots[i].bot.username}<br>
-                                        <span class="uuid" style="font-size: 10px; --tw-text-opacity: 1; color: rgba(154.148,165.363,177.352,var(--tw-text-opacity));">${payload.bots[i].bot.uuid}</span>
-                                        <i style="font-size: 1rem; display: block;">${payload.bots[i].room.name}</i>
+                                    ${uniqueBots[i].bot.username}<br>
+                                        <span class="uuid" style="font-size: 10px; --tw-text-opacity: 1; color: rgba(154.148,165.363,177.352,var(--tw-text-opacity));">${uniqueBots[i].bot.uuid}</span>
+                                        <i style="font-size: 1rem; display: block;">${(uniqueBots[i].room.name == null) ? "" : uniqueBots[i].room.name}</i>
 
                                         </div>
 
                                     <div class="right-col-rooms">
-                                      <i class="fas fa-user-friends" aria-hidden="true"></i> ${payload.bots[i].room.listening}
+                                      <i class="fas fa-user-friends" aria-hidden="true"></i> ${(uniqueBots[i].room.listening == null) ? 0 : uniqueBots[i].room.listening}
                                     </div>
                                 </div>
                                 <br><br>
@@ -211,20 +220,21 @@ $(document).ready(function () {
                         </div>
                     </a><br>`
                     }
-                    for (let j=0; j < payload.bots.length; j++) {
-                        if (payload.bots[i].bot.uuid == document.getElementsByClassName("uuid")[j].innerText) {
-                            botExists = true;
-                            document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[2].innerHTML = `<i class="fas fa-user-friends" aria-hidden="true"></i> `+ payload.bots[i].room.listening;
-                            document.getElementsByClassName("uuid")[j].parentElement.children[2].innerText = payload.bots[i].room.name;
+                    for (let j = 0; j < uniqueBots.length; j++) {
+                        if (document.getElementsByClassName("uuid")[j] != undefined) {
+                            if (uniqueBots[i].bot.uuid == document.getElementsByClassName("uuid")[j].innerText) {
+                                botExists = true;
+                                document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[2].innerHTML = `<i class="fas fa-user-friends" aria-hidden="true"></i> ` + ((uniqueBots[i].room.listening == null) ? 0 : uniqueBots[i].room.listening);
+                                document.getElementsByClassName("uuid")[j].parentElement.children[2].innerText = (uniqueBots[i].room.name == null) ? "" : uniqueBots[i].room.name;
+                            }
                         }
                     }
-                    if (i == (payload.bots.length -1) && botExists == false) {
-                        // console.log(`Remove Bot`);
+                    if (i == (uniqueBots.length - 1) && botExists == false) {
                         document.getElementById('testBots').children[i].remove();
                         document.getElementById('testBots').children[i].remove();
                     }
                 }
-            }        
+            }
         })
     }
 
