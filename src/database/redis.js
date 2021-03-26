@@ -15,7 +15,7 @@ const redisOptions = {
     connectionName: `dogegarden-stats`,
 };
 
-function createClient ( prefix, options = {} ) {
+function createClient(prefix, options = {}) {
     const allOptions = {
         ...redisOptions,
         ...options,
@@ -26,18 +26,26 @@ function createClient ( prefix, options = {} ) {
     return new Redis(allOptions);
 }
 
+// const redisDemo = async () => {
+//     const clientTest = createClient(`test1`);
+//     const redis = clientTest.multi();
+//     const reply = await redis.get('foo');
+//     console.log(reply);
+// };
+
+// redisDemo();
+
 
 // const test = async () => {
 //     const clientTest = createClient(`test1`);
 //     const multi = clientTest.multi();
-//     multi.set(`first-test`, 123)
-//     multi.set(`a`, 1);
-//     multi.get(`a`);
-//     multi.get(`first-test`);
+//     // multi.set(`a`, 1);
+//     // multi.get(`a`);
+//     multi.get(`dogestats`);
 //     return await multi.exec();
 // }
 
-// test().then(( ...args ) => console.log(...args));
+// test().then((...args) => console.log(...args));
 
 // const test = async () => {
 //     let data = await axios.get('http://localhost:7000/api/statistics')
@@ -51,8 +59,15 @@ function createClient ( prefix, options = {} ) {
 //     return await multi.exec();
 // }
 
-// try {  
-// test().then(( ...args ) => console.log(...args));
+// const test = async () => {
+//     const clientTest = createClient(`test1`);
+//     const multi = clientTest.multi();
+//     multi.get(`dogestats`);
+//     return await multi.exec();
+// }
+
+// try {
+//     test().then((...args) => console.log(...args));
 // } catch (e) {
 //     console.log("Error in redis", e)
 // }
