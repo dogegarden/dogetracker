@@ -1,14 +1,68 @@
-function dropdownUpdate(value, element) {
-    document.getElementById(element.parentElement.getAttribute('aria-labelledby')).innerText = value;
-    changeDataset(((element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartTimeframe') ? 'statsChart' : 'roomsChart'), value)
+function dropdownUpdate(element) {
+    document.getElementById(element.parentElement.getAttribute('aria-labelledby')).innerText = element.innerText;
+    // changeDataset(((element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartTimeframe') ? 'statsChart' : 'roomsChart'), element.innerText)
 }
 
-function changeDataset(canvasID, value) {
-    console.log(`Canvas ${canvasID} | value ${value}`)
-}
+// function changeDataset(canvasID, value) {
+//     console.log(`Canvas ${canvasID} | value ${value}`)
+//     let lookup = ['Live', '24h', 'Week', 'Month', 'All Time'];
+//     let curChart;
+//     let lookupIndex = lookup.indexOf(value);
+//     if (canvasID == 'statsChart') {
+//         let curConfig = lookupIndex;
+//         curChart = window.chart;
+
+//     } else {
+//         let curConfig = window.roomConfig
+//         curChart = window.chartRooms;
+//     }
+//     curConfig = lookupIndex;
+//     // Update chart
+//     // What data do we want to update
+//     if (lookupIndex == 0) {
+//         // Live
+//         curChart.data.labels = [];
+//         curChart.data.datasets[0].data = curConfig.datasets[0];
+//         window.chart.options.scales.xAxes[0].scaleLabel.labelString = "Seconds";
+//         // window.chartConfig.step = 0;
+//         // Consider storing this data in the background
+//     } else if (lookupIndex == 1) {
+//         // 24h
+//         curChart.data.labels = [];
+//         curChart.data.datasets[0].data = [];
+//         window.chart.options.scales.xAxes[0].scaleLabel.labelString = "Hours";
+//     } else if (lookupIndex == 2) {
+//         // Weeks
+//         curChart.data.labels = [];
+//         curChart.data.datasets[0].data = [];
+//         window.chart.options.scales.xAxes[0].scaleLabel.labelString = "Hours";
+//     } else if (lookupIndex == 3) {
+//         // Month
+//         curChart.data.labels = [];
+//         curChart.data.datasets[0].data = [];
+//         window.chart.options.scales.xAxes[0].scaleLabel.labelString = "Days";
+//     } else if (lookupIndex == 4) {
+//         // All Time
+//         curChart.data.labels = [];
+//         curChart.data.datasets[0].data = [];
+//         // Store start date as value and work out day, week, month, year
+//         window.chart.options.scales.xAxes[0].scaleLabel.labelString = "Days";
+//     } else {
+//         console.log(`Error | lookupIndex ${lookupIndex}`);
+//     }
+//     curChart.update();
+// }
 
 $(document).ready(function () {
 
+    window.statsConfig = {
+        "dataset": 0,
+        "datasets" : []
+    };
+    window.roomConfig = {
+        "dataset": 0,
+        "datasets" : []
+    };
     function update() {
         $.ajax({
             url: '/api/statistics',
@@ -203,7 +257,7 @@ $(document).ready(function () {
                         <div class="card accounts-card">
                             <div class="card-body border-r">
                                 <div class="con-grid1">
-                                    <img class="account-avatar" src="https://avatars.githubusercontent.com/u/80551136?s=280&v=4">
+                                    <img class="account-avatar" src="${uniqueBots[i].bot.avatar}">
                                     <div class="account-text" style="line-height: 15px; text-align: left;">
                                     ${uniqueBots[i].bot.username}<br>
                                         <span class="uuid" style="font-size: 10px; --tw-text-opacity: 1; color: rgba(154.148,165.363,177.352,var(--tw-text-opacity));">${uniqueBots[i].bot.uuid}</span>
@@ -224,8 +278,9 @@ $(document).ready(function () {
                         if (document.getElementsByClassName("uuid")[j] != undefined) {
                             if (uniqueBots[i].bot.uuid == document.getElementsByClassName("uuid")[j].innerText) {
                                 botExists = true;
-                                document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[2].innerHTML = `<i class="fas fa-user-friends" aria-hidden="true"></i> ` + ((uniqueBots[i].room.listening == null) ? 0 : uniqueBots[i].room.listening);
+                                document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[2].innerHTML = `<i class="fas fa-user-friends" aria-hidden="true"></i> ` + ((uniqueBots[i].room.listening == "No Room") ? 0 : uniqueBots[i].room.listening);
                                 document.getElementsByClassName("uuid")[j].parentElement.children[2].innerText = (uniqueBots[i].room.name == null) ? "" : uniqueBots[i].room.name;
+                                // document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[0].src = uniqueBots[i].bot.avatar;
                             }
                         }
                     }
