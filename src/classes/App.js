@@ -7,13 +7,8 @@ const Router = require('./Router');
 const Logger = require('../util/Logger')
 const fs = require('fs').promises;
 const axios = require('axios')
-const Calls = require('../database/mongo')
 require('dotenv').config()
 
-
-const {
-    test: testRedis
-} = require('../database/redis');
 
 class App {
     server;

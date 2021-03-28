@@ -1,48 +1,54 @@
 const cron = require('node-cron');
-const { createClient } = require('../database/redis');
 const axios = require('axios')
-const roomsClient = createClient(`rooms`);
-const express = require('express')
-
-app = express();
+const mysql = require('mysql');
+const Logger = require('../util/Logger')
 
 function setCron() {
-    cron.schedule('*/10 * * * *', sendRedisData);
+    cron.schedule('*/10 * * * *', saveMYSQL);
 }
 
-function sendRedisData() {
-    console.log(`Sending data to redis database`);
-    let redisExpire = 864000;
-    try {
-        axios.get('https://api.dogehouse.xyz/v1/popularRooms?dogestatsRedis')
-            .then(async function (response) {
-                const { rooms } = response.data;
+function saveMYSQL() {
+    var con = mysql.createConnection({
+        host: process.env.MYSQL_HOST,
+        user: process.env.MYSQL_USER,
+        password: process.env.MYSQL_PASS,
+        database: process.env.MYSQL_DB
+    });
 
-                const multi = roomsClient.multi();
-                const now = Date.now();
-
-                for (let i = 0; i < rooms.length; ++i) {
-                    let room = rooms[i];
-
-                    const countKey = `${room.id}:count:${now}`;
-                    const usersKey = `${room.id}:users:${now}`;
-                    multi.sadd(countKey, room.numPeopleInside);
-                    multi.expire(countKey, redisExpire)
-                    multi.sadd(usersKey, room.peoplePreviewList.map(({ id }) => id));
-                    multi.expire(usersKey, redisExpire)
-
+    con.connect(async function (err) {
+        if (err) throw err;
+        Logger.mysql(`Connected`);
+        let data;
+        try {
+            data = await axios.get('https://api.dogehouse.xyz/v1/popularRooms?mysql')
+            data = data.data;
+            let sql = 'INSERT IGNORE INTO users (uuid, numFollowers, displayName) VALUES ';
+            for (j = 0; j < data.rooms.length; j++) {
+                for (i = 0; i < data.rooms[j].peoplePreviewList.length; i++) {
+                    sql += '("' + data.rooms[j].peoplePreviewList[i].id + '", ' + data.rooms[j].peoplePreviewList[i].numFollowers + ', "' + data.rooms[j].peoplePreviewList[i].displayName + '"), ';
                 }
-                const redisResult = await multi.exec();
-                console.log(`by ID: meta - `, redisResult[0][1]);
-                console.log(`by ID: count - `, redisResult[1][1]);
-                console.log(`by ID: users - `, redisResult[2][1]);
-            })
-            .catch(function (error) {
-                console.log(error);
-            })
-    } catch (e) {
-        return console.log('Error in getting data from api')
-    }
+            }
+            sql = sql.slice(0, sql.length - 2);
+
+            con.query(sql, function (err, result) {
+                if (err) throw err;
+                console.log("users inserted");
+            });
+
+            sql = 'INSERT IGNORE INTO rooms (id, creatorId, description, insertedAt, roomName, numPeopleInside) VALUES ';
+            for (i = 0; i < data.rooms.length; i++) {
+                sql += '("' + data.rooms[i].id + '", "' + data.rooms[i].creatorId + '", "' + data.rooms[i].description + '", "' + data.rooms[i].inserted_at + '", "' + data.rooms[i].name + '", ' + data.rooms[i].numPeopleInside + '), ';
+            }
+            sql = sql.slice(0, sql.length - 2);
+
+            con.query(sql, function (err, result) {
+                if (err) throw err;
+                console.log("rooms inserted");
+            });
+        } catch (e) {
+            return console.log('Error in getting data from api')
+        }
+    });
 }
 
 module.exports = {

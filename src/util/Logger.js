@@ -26,20 +26,15 @@ class Logger {
         console.log(this.prefix + ' ' + chalk.blue('[ROUTE]') + ' ' + args.join(' '))
     }
 
-    static reddis(...args) {
+    static mysql(...args) {
         args = this.formatInput(args)
-        console.log(this.prefix + ' ' + chalk.magenta('[REDDIS]') + ' ' + args.join(' '))
-    }
-
-    static mongo(...args) {
-        args = this.formatInput(args)
-        console.log(this.prefix + ' ' + chalk.green('[MONGODB]') + ' ' + args.join(' '))
+        console.log(this.prefix + ' ' + chalk.cyan('[MYSQL]') + ' ' + args.join(' '))
     }
 
     static API(...args) {
         args = this.formatInput(args)
         console.log(this.prefix + ' ' + chalk.cyan('[API]') + ' ' + args.join(' '))
-    } 
+    }
 
 }
 

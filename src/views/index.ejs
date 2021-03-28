@@ -23,7 +23,7 @@
                     <div class="container">
                         <h1 class="display-3">DogeTracker</h1>
                         <br>
-                        <p>View, manage and explore statistics and historical data from <a target="_blank"href="dogehouse.tv">dogehouse.tv</a><br>Made possible by <a href="https://github.com/dogegarden/dogehouse-js">dogehouse-js</a> & <a href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a></p>
+                        <p>View, manage and explore statistics and historical data from <a target="_blank"href="http://dogehouse.tv">dogehouse.tv</a><br>Made possible by <a href="https://github.com/dogegarden/dogehouse-js">dogehouse-js</a> & <a href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a></p>
                     </div>
                 </div>
 
@@ -72,7 +72,7 @@
                                         <i class="fas fa-fire fa-3x icon pr-2"></i><strong class="card-stat-count"> Trending</strong></div><br>
                                         <p>
                                         <strong id="topRoomName">
-                                        <a id="topRoomLink" target="_blank" href="dogehouse.tv/rooms/idgoeshere"></a>
+                                        <a id="topRoomLink" target="_blank" href="https://dogehouse.tv/rooms/idgoeshere"></a>
                                         <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
                                         </strong> 
                                         containing
@@ -93,16 +93,17 @@
                                     <div class="btn-group pl-2" role="group" aria-label="Button group with nested dropdown">
                                      <div class="btn-group" role="group">
                                       <button id="userActivityChartTimeframe" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        24h
+                                        Live
                                       </button>
                                       <div class="dropdown-menu" aria-labelledby="userActivityChartTimeframe">
                                         <hr>
                                         <a class="dropdown-item"><strong>Coming Soon</strong></a>
                                         <hr>
-                                        <a class="dropdown-item" onclick="dropdownUpdate('24h', this);">24h</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate('Week', this);">Week</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate('Month', this);">Month</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate('All Time', this);">All Time</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Live</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">24h</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Week</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Month</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">All Time</a>
                                       </div>
                                     </div>
                                   </div>
@@ -118,16 +119,17 @@
                                 <div class="btn-group pl-2" role="group" aria-label="Button group with nested dropdown">
                                     <div class="btn-group" role="group">
                                      <button id="roomActivityChartTimeframe" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                       24h
+                                        Live
                                      </button>
                                      <div class="dropdown-menu" aria-labelledby="roomActivityChartTimeframe">
                                          <hr>
                                         <a class="dropdown-item"><strong>Coming Soon</strong></a>
                                         <hr>
-                                        <a class="dropdown-item" onclick="dropdownUpdate('24h', this);">24h</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate('Week', this);">Week</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate('Month', this);">Month</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate('All Time', this);">All Time</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Live</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">24h</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Week</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Month</a>
+                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">All Time</a>
                                      </div>
                                    </div>
                                  </div>
@@ -166,7 +168,7 @@
                                     <i class="fas fa-plus-circle fa-3x icon pr-2"></i><strong class="card-stat-count"> Newest Room</strong></div><br>
                                     <p>
                                     <strong id="newestRoom">
-                                    <a id="newestRoomLink" target="_blank" href="dogehouse.tv/rooms/idgoeshere"></a>
+                                    <a id="newestRoomLink" target="_blank" href="https://dogehouse.tv/rooms/idgoeshere"></a>
                                     <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
                                     </strong> 
                                     containing
@@ -184,7 +186,7 @@
                                     <i class="fas fa-history fa-3x icon pr-2"></i><strong class="card-stat-count"> Longest Active Room</strong></div><br>
                                     <p>
                                     <strong id="longestRoom">
-                                    <a id="longestRoomLink" target="_blank" href="dogehouse.tv/rooms/idgoeshere"></a>
+                                    <a id="longestRoomLink" target="_blank" href="https://dogehouse.tv/rooms/idgoeshere"></a>
                                     <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
                                     </strong> 
                                     containing
