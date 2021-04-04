@@ -33,5 +33,5 @@ CREATE TABLE IF NOT EXISTS stats (
      topRoomID VARCHAR(36),
      newestRoomID VARCHAR(36),
      longestRoomID VARCHAR(36),
-     statsTime TIMESTAMP NOT NULL
+     statsTime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
