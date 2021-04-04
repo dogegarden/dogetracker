@@ -54,7 +54,7 @@ function saveMYSQL() {
 
             data = await axios.get(process.env.HOST_URL+'api/statistics?mysql')
             data = data.data;
-            sql = `INSERT INTO stats (totalRooms, totalScheduledRooms, totalOnline, totalBotsOnline, totalBotsSendingTelemetry, topRoomID, newestRoomID, longestRoomID, statsTime) VALUES (${data.totalRooms}, ${data.totalScheduled}, ${data.totalOnline}, ${data.totalBotsOnline}, ${data.totalBotsSendingTelemetry}, '${data.topRoom.id}', '${data.newestRoom.id}', '${data.longestRoom.id}', '${new Date().toISOString()}')`;
+            sql = `INSERT INTO stats (totalRooms, totalScheduledRooms, totalOnline, totalBotsOnline, totalBotsSendingTelemetry, topRoomID, newestRoomID, longestRoomID) VALUES (${data.totalRooms}, ${data.totalScheduled}, ${data.totalOnline}, ${data.totalBotsOnline}, ${data.totalBotsSendingTelemetry}, '${data.topRoom.id}', '${data.newestRoom.id}', '${data.longestRoom.id}')`;
 
             con.query(sql, function (err, result) {
                 if (err) throw err;
