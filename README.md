@@ -25,7 +25,7 @@
 
 ## Installation
 
-- You need a MongoDB and Redis database setup. You can get them for free from MongoDB Atlas & RedisLabs.
+- You need a MySQL Server to run the /src/database/setup.sql database setup.
 
 1. git clone https://github.com/dogegarden/dogegarden-stats
 2. Install [NodeJS](https://nodejs.org/en/) and [NPM](https://www.npmjs.com/).
