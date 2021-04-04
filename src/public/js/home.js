@@ -1,13 +1,89 @@
-function dropdownUpdate(value, element) {
-    document.getElementById(element.parentElement.getAttribute('aria-labelledby')).innerText = value;
-    changeDataset(((element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartTimeframe') ? 'statsChart' : 'roomsChart'), value)
+let lookup = ['Live', '24h', 'Week', 'Month', 'All Time'];
+
+function dropdownUpdate(element) {
+    document.getElementById(element.parentElement.getAttribute('aria-labelledby')).innerText = element.innerText;
+    changeDataset(((element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartTimeframe') ? 'statsChart' : 'roomsChart'), element.innerText)
 }
 
 function changeDataset(canvasID, value) {
-    console.log(`Canvas ${canvasID} | value ${value}`)
+    // console.log(`Canvas ${canvasID} | value ${value}`)
+    let curChart;
+    let lookupIndex = lookup.indexOf(value);
+    let dataName = ``;
+    if (canvasID == 'statsChart') {
+        dataName = 'totalOnline'
+        curChart = window.chart;
+    } else {
+        dataName = 'totalRooms'
+        curChart = window.chartRooms;
+    }
+    // Update chart
+    // What data do we want to update
+    if (lookupIndex != -1) {
+        // (new Date).toLocaleTimeString()
+        curChart.data.datasets[0].data = statsConfig[lookupIndex].map(({ [`${dataName}`]: val }) => val);
+        curChart.options.scales.xAxes[0].scaleLabel.labelString = "Time";
+    }
+
+    if (lookupIndex == 0) {
+        // Live
+        curChart.data.labels = statsConfig[0].map(({ [`statsTime`]: val }) => val);
+        curChart.options.scales.xAxes[0].scaleLabel.labelString = "Seconds";
+        // window.chartConfig.step = 0;
+        // Consider storing this data in the background
+    } else if (lookupIndex == 1) {
+        // 24h
+        curChart.data.labels = statsConfig[1].map(({ [`statsTime`]: val }) => new Date(val).toLocaleTimeString());
+    } else if (lookupIndex == 2) {
+        // Weeks
+        let days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+        curChart.data.labels = statsConfig[2].map(({ [`statsTime`]: val }) => days[new Date(val).getDay()]+" "+new Date(val).toLocaleTimeString());
+    } else if (lookupIndex == 3) {
+        // Month
+        curChart.data.labels = statsConfig[3].map(({ [`statsTime`]: val }) => new Date(val).toLocaleDateString());
+    } else if (lookupIndex == 4) {
+        // All Time
+        // Store start date as value and work out day, week, month, year
+        curChart.data.labels = statsConfig[4].map(({ [`statsTime`]: val }) => new Date(val).toLocaleDateString());
+    } else {
+        console.log(`Error | lookupIndex ${lookupIndex}`);
+    }
+    curChart.update();
 }
 
 $(document).ready(function () {
+
+    window.statsConfig = [[],[],[],[],[]];
+
+    function getLongTermData() {
+        $.ajax({
+            url: '/api/mysql?time=24h',
+            success: (payload) => {
+                statsConfig[1] = payload
+            }
+        })
+        $.ajax({
+            url: '/api/mysql?time=week',
+            success: (payload) => {
+                statsConfig[2] = payload
+            }
+        })
+        $.ajax({
+            url: '/api/mysql?time=month',
+            success: (payload) => {
+                statsConfig[3] = payload
+            }
+        })
+        $.ajax({
+            url: '/api/mysql?time=alltime',
+            success: (payload) => {
+                statsConfig[4] = payload
+            }
+        })
+    }
+
+    getLongTermData();
+
 
     function update() {
         $.ajax({
@@ -58,11 +134,7 @@ $(document).ready(function () {
                     // let timeDiffHours = timeDiff / 60
                     // let shortenedText = ~~timeDiffHours;
 
-
-
                     // shortenedText === 24 ? shortenedText = 0 :  console.log(shortenedText)
-
-
 
                     // let minutes = ~~((timeDiffHours - ~~timeDiffHours) * 60)
                     // let days = 0;
@@ -74,10 +146,6 @@ $(document).ready(function () {
                     let days = ~~(timeDiff / 60 / 24)
                     let minutes = ~~(timeDiff % 60)
                     let hours = ~~(timeDiff / 60 % 24)
-
-
-
-
 
                     function changeText(text = 'Generating...') {
 
@@ -143,41 +211,32 @@ $(document).ready(function () {
                         'step': 0,
                         'limit': 100
                     }
-                    window.chartData = {
-                        'datasets': [0, 1, 2]
-                    };
                 };
 
-                // User Acitivty Chart
-                var time = window.chartConfig.step * 5;
-                window.chart.config.data.labels.push(time);
-                window.chartConfig.step++;
-                window.chart.config.data.datasets.forEach(function (dataset) {
-                    dataset.data.push(payload.totalOnline);
+                // Stats config
+                statsConfig[0].push({
+                    'totalRooms' : payload.totalRooms,
+                    'totalOnline' : payload.totalOnline,
+                    'statsTime' : window.chartConfig.step * 5
                 });
-                // Check if datapoints need to be removed
-                // if (window.chart.data.datasets[0].data.length > 20) {
-                //     // window.chart.data.datasets[0].data = window.chart.data.datasets[0].data.slice(1);
-                //     // window.chart.data.labels = window.chart.data.labels.slice(1);
-                // }
-                // window.chart.options.scales.xAxes[0].scaleLabel.labelString = "Minutes"
-                // window.chartRooms.options.scales.xAxes[0].scaleLabel.labelString = "Minutes"
+
+                window.chartConfig.step++;
+                var time = window.chartConfig.step * 5;
+                
+                // Check for removal
                 if (window.chart.data.datasets[0].data.length >= window.chartConfig.limit) {
-                    window.chart.data.datasets[0].data = window.chart.data.datasets[0].data.slice(1);
-                    window.chart.data.labels = window.chart.data.labels.slice(1);
-                    window.chartRooms.data.datasets[0].data = window.chartRooms.data.datasets[0].data.slice(1);
-                    window.chartRooms.data.labels = window.chartRooms.data.labels.slice(1);
+                    statsConfig[lookupIndex] = statsConfig[lookupIndex].slice(1);
                 }
 
-                // Room Acitivty Chart
-                window.chartRooms.config.data.labels.push(time);
+                // User Acitivty Chart
+                changeDataset('statsChart',document.getElementById("userActivityChartTimeframe").innerText.trim())
 
-                window.chartRooms.config.data.datasets.forEach(function (dataset) {
-                    dataset.data.push(payload.totalRooms);
-                });
+                // Room Acitivty Chart
+                changeDataset('roomsChart',document.getElementById("roomActivityChartTimeframe").innerText.trim())
+
+                // Update
                 window.chart.update();
                 window.chartRooms.update();
-
             }
         });
         $.ajax({
@@ -203,7 +262,7 @@ $(document).ready(function () {
                         <div class="card accounts-card">
                             <div class="card-body border-r">
                                 <div class="con-grid1">
-                                    <img class="account-avatar" src="https://avatars.githubusercontent.com/u/80551136?s=280&v=4">
+                                    <img class="account-avatar" src="${uniqueBots[i].bot.avatar}">
                                     <div class="account-text" style="line-height: 15px; text-align: left;">
                                     ${uniqueBots[i].bot.username}<br>
                                         <span class="uuid" style="font-size: 10px; --tw-text-opacity: 1; color: rgba(154.148,165.363,177.352,var(--tw-text-opacity));">${uniqueBots[i].bot.uuid}</span>
@@ -224,8 +283,9 @@ $(document).ready(function () {
                         if (document.getElementsByClassName("uuid")[j] != undefined) {
                             if (uniqueBots[i].bot.uuid == document.getElementsByClassName("uuid")[j].innerText) {
                                 botExists = true;
-                                document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[2].innerHTML = `<i class="fas fa-user-friends" aria-hidden="true"></i> ` + ((uniqueBots[i].room.listening == null) ? 0 : uniqueBots[i].room.listening);
+                                document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[2].innerHTML = `<i class="fas fa-user-friends" aria-hidden="true"></i> ` + ((uniqueBots[i].room.listening == "No Room") ? 0 : uniqueBots[i].room.listening);
                                 document.getElementsByClassName("uuid")[j].parentElement.children[2].innerText = (uniqueBots[i].room.name == null) ? "" : uniqueBots[i].room.name;
+                                // document.getElementsByClassName("uuid")[j].parentElement.parentElement.children[0].src = uniqueBots[i].bot.avatar;
                             }
                         }
                     }

@@ -1,49 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
+  <%- include('./Components/Head', { title: 'Scheduled'}) %> <%-
+  include('./Components/Navbar') %>
 
-    <%- include('./Components/Head', { title: 'Scheduled'}) %>
-    <%- include('./Components/Navbar') %>
-
-<body>
-
-<div role="main" class="container text-center cover-container d-flex h-100 p-3 mx-auto flex-column">
-    <div class="jumbotron" style="background-color: inherit">
+  <body>
+    <div
+      role="main"
+      class="container text-center cover-container d-flex h-100 p-3 mx-auto flex-column"
+    >
+      <div class="jumbotron" style="background-color: inherit">
         <div class="container">
           <h1 class="display-3">DogeTracker</h1>
-          <br>
-          <p>View, manage and explore statistics and historical data from <a target="_blank" href="dogehouse.tv">dogehouse.tv</a></p>
+          <br />
+          <p>
+            View, manage and explore statistics and historical data from
+            <a target="_blank" href="https://dogehouse.tv">dogehouse.tv</a>
+          </p>
         </div>
-    </div>
+      </div>
 
       <div class="row">
         <div class="col-xl">
-
-            <div class="nav" style="margin-bottom: 20px;">
-            </div>
-            <div class="accounts-wrapper">
-                <p>Showing <b><%= rooms.length %></b> room<% if (rooms.length < 1 || rooms.length > 1) { %>s<% } %>.</p>
-                <% rooms.forEach(function(room){ %>
-                    <a>
-                        <div class="card accounts-card">
-                            <div class="card-body border-r">
-                                <div class="con-grid1">
-                                    <img class="account-avatar" src="https://avatars.githubusercontent.com/u/80551136?s=280&v=4">
-                                    <div class="account-text" style="line-height: 15px; text-align: left;">
-                                        <%= room.name %><br>
-                                        <span style="font-size: 10px; --tw-text-opacity: 1; color: rgba(154.148,165.363,177.352,var(--tw-text-opacity));"><%= room.id %></span>
-                                    </div>
-                                    <div class="right-col-rooms">
-                                      <i class="fas fa-user-friends"></i>
-                                        <%= room.numPeopleInside %>
-                                    </div>
-                                </div>
-                                <br><br>
-                            </div>
-                        </div>
-                    </a><br>
-                    <% }); %>
-            </div>
+          <div class="nav" style="margin-bottom: 20px"></div>
+          <div class="accounts-wrapper">
+            <p>
+              Showing <b><%= rooms.length %></b> room<% if (rooms.length < 1 ||
+              rooms.length > 1) { %>s<% } %>.
+            </p>
+            <% rooms.forEach(function(room){ %>
+            <a>
+              <div class="card accounts-card">
+                <div class="card-body border-r">
+                  <div class="con-grid1">
+                    <img
+                      class="account-avatar"
+                      src="https://avatars.githubusercontent.com/u/80551136?s=280&v=4"
+                    />
+                    <div
+                      class="account-text"
+                      style="line-height: 15px; text-align: left"
+                    >
+                      <%= room.name %><br />
+                      <span
+                        style="
+                          font-size: 10px;
+                          --tw-text-opacity: 1;
+                          color: rgba(
+                            154.148,
+                            165.363,
+                            177.352,
+                            var(--tw-text-opacity)
+                          );
+                        "
+                        ><%= room.id %></span
+                      >
+                    </div>
+                    <div class="right-col-rooms">
+                      <i class="fas fa-user-friends"></i>
+                      <%= room.numPeopleInside %>
+                    </div>
+                  </div>
+                  <br /><br />
+                </div>
+              </div> </a
+            ><br />
+            <% }); %>
+          </div>
         </div>
+      </div>
     </div>
-</div>
-</body>
+  </body>
+</html>
