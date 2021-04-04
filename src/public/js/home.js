@@ -292,7 +292,6 @@ $(document).ready(function () {
             }
         })
     }
-
     update();
     setInterval(update, 5000);
 });
