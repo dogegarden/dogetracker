@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS rooms (
      roomDescription TEXT,
      insertedAt TIMESTAMP NOT NULL,
      roomName TEXT NOT NULL,
-     numPeopleInside INT NOT NULL DEFAULT 0,
+     numPeopleInside INT NOT NULL DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS stats (
