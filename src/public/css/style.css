@@ -1,3 +1,8 @@
+:root {
+  --background: rgba(20,25,32);
+  --nav: #22272E;
+}
+
 @import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@500&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Rubik&display=swap");
 html,
@@ -7,7 +12,12 @@ body {
   padding: 0;
   font-family: Rubik, -apple-system, BlinkMacSystemFont, "Helvetica Neue",
     Roboto, system-ui, sans-serif;
-  background: #33404d !important;
+  background: var(--background) !important;
+}
+
+
+#api-alert:not(.show) {
+  opacity: 1;
 }
 
 .card-stat-count {
@@ -27,7 +37,7 @@ z #botsOnline {
 }
 
 .moving-bg {
-  background-image: url("../static//moving-bg.png");
+  background-image: url("../static/moving-bg.png");
   background-color: rgba(134, 134, 134, 0.075) !important;
   background-size: 50%;
   animation: bganim 40s linear 0s infinite;
@@ -52,10 +62,18 @@ z #botsOnline {
   transition: 0.15s;
 }
 
+.show {
+  display: none;
+}
 /* CLEAR - DEFAULT */
 
+.ex-c {
+  border: 3px solid #f4055f;
+  background-color: rgba(20,25,32) !important;
+}
+
 .ex-c:hover {
-  background-color: #72727231 !important;
+  background-color: rgba(16, 16, 16, 0.788) !important
 }
 
 /* PINK */
@@ -68,7 +86,7 @@ z #botsOnline {
 }
 
 .border-p {
-  border: 3px solid #c0c0c04b;
+  border: 3px solid #f4055f;
   transition: 0.5s;
 }
 
@@ -264,6 +282,17 @@ select:focus {
   margin: 0 5px 0 5px;
 }
 
+.min-w {
+  min-width: 90vw !important;
+}
+/* 
+.right-fixed {
+  position: fixed;
+  bottom: 0px;
+  right: 0px; 
+  padding: 30px;
+} */
+
 a.active,
 div.active {
   --tw-text-opacity: 1;
@@ -371,8 +400,8 @@ div.active {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
     var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
   --tw-bg-opacity: 1;
-  background-color: rgba(62.73, 76.959, 90.27, var(--tw-bg-opacity));
-  border-radius: 0 0 0.25rem 0.25rem;
+  background-color: var(--nav);
+  border-radius: 0.25rem 0.25rem 0.25rem 0.25rem;
   padding: 0.75rem;
   display: flex;
   font-size: 0.75rem;
@@ -684,7 +713,7 @@ a:hover {
 
 .card-header {
   --tw-bg-opacity: 1 !important;
-  background-color: rgba(31.008, 40.8, 50.592, var(--tw-bg-opacity)) !important;
+  background-color: var(--nav) !important;
   border-top-left-radius: 0.25rem !important;
   border-top-right-radius: 0.25rem !important;
   padding: 0.75rem !important;
@@ -1141,7 +1170,7 @@ h3 {
 }
 
 nav {
-  background-color: rgba(31.008, 40.8, 50.592);
+  background-color: var(--nav);
   z-index: 9999;
 }
 
@@ -1389,6 +1418,9 @@ i {
 }
 
 @media only screen and (max-width: 414px) {
+  .right-fixed-fullscreen {
+    display: none;
+  }
   .di {
     display: none;
   }

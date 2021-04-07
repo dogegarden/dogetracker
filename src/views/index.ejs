@@ -4,203 +4,331 @@
 <%- include('./Components/Head', { title: 'Home' }) %>
     <%- include('./Components/Navbar') %>
         <%- include('./Components/Noscript') %>
-        <body>
 
-            <div role="main" class="container text-center cover-container d-flex h-100 p-3 mx-auto flex-column">
-                <div class="jumbotron" style="background-color: inherit">
-                    <div class="container">
-                        <h1 class="display-3">DogeTracker</h1>
-                        <br>
-                        <p>View, manage and explore statistics and historical data from <a target="_blank"href="http://dogehouse.tv">dogehouse.tv</a><br>Made possible by <a href="https://github.com/dogegarden/dogehouse-js">dogehouse-js</a> & <a href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a></p>
+            <body>
+                <div role="main" class="container text-center cover-container d-flex h-100 p-3 mx-auto flex-column fsl"
+                    style="min-width: 1500px;">
+                    <div class="jumbotron" style="background-color: inherit">
+                        <div class="container">
+                            <h1 class="display-3">DogeTracker</h1>
+                            <br>
+                            <p>View, manage and explore statistics and historical data from <a target="_blank"
+                                    href="http://dogehouse.tv">dogehouse.tv</a><br>Made possible by <a
+                                    href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a></p>
+                        </div>
                     </div>
-                </div>
-
-                <div class="container">
-                    <!-- <div class="alert alert-danger alert-dismissible fade show fade-in" role="alert">
+                    <div class="container fsl" style="min-width: 1500px;">
+                        <div class="alert alert-danger alert-dismissible fade show fade-in" id="api-alert" role="alert">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
                         </button>
-                        <h4 class="alert-heading"><i class="fas fa-bullhorn"></i> Important Notice!</h4>
-                        <p>The room counters are currently displaying misleading information. This issue has been rasied
-                            with DogeHouse.</p>
-                        <p class="mb-0">You can read more about this at <a
-                                href="https://github.com/benawad/dogehouse/issues/1135">this GitHub issue</a>
+                        <h4 class="alert-heading"><i class="fas fa-bullhorn"></i> API Offline...</h4>
+                        <p>We have detected that the API is currently offline. While you can still view old and historical data, no new data will be available while this issue lasts.</p>
+                        <p class="mb-0">See more at our <a
+                                href="https://status.dogehouse.xyz">Status Page</a>.
                         </p>
-                    </div> -->
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card test">
-                                <div class="card-body fixed-height remove-bg moving-bg zoom-in ex-c border-p" style="padding-top: 30px">
-                                    <div class="col-md-4">
-                                        <i class="fas fa-house-user fa-3x icon pr-1"></i> <strong
-                                            id="roomCount" class="card-stat-count"><i
-                                                class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
-                                        <p class="pt-1 p-text"> public room<span id="roomFix">s</span></p>
+                    </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card test">
+                                    <div class="card-body fixed-height remove-bg moving-bg zoom-in ex-c border-p"
+                                        style="padding-top: 30px">
+                                        <div class="col-md-4">
+                                            <i class="fas fa-house-user fa-3x icon pr-1"></i> <strong id="roomCount"
+                                                class="card-stat-count"><i
+                                                    class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
+                                            <p class="pt-1 p-text"> public room<span id="roomFix">s</span></p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <i class="fas fa-users fa-3x icon pr-1"></i> <strong id="userCount"
+                                                class="card-stat-count"><i
+                                                    class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
+                                            <p class="pr-1 p-text"> online across site</p>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <i class="fas fa-clock fa-3x icon pr-1"></i> <strong id="scheduledCount"
+                                                class="card-stat-count"><i
+                                                    class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
+                                            <p class="pt-1 p-text"> scheduled room<span id="scheduledFix">s</span></p>
+                                        </div>
                                     </div>
-                                    <div class="col-md-4">
-                                        <i class="fas fa-users fa-3x icon pr-1"></i> <strong
-                                            id="userCount" class="card-stat-count"><i
-                                                class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
-                                        <p class="pr-1 p-text"> online across site</p>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <i class="fas fa-clock fa-3x icon pr-1"></i> <strong
-                                            id="scheduledCount" class="card-stat-count"><i
-                                                class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
-                                        <p class="pt-1 p-text"> scheduled room<span id="scheduledFix">s</span></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card test">
+                                    <div class="card-body fixed-height remove-bg moving-bg zoom-in ex-c border-p">
+                                        <div class="col-md-12">
+                                            <div style="display: flex; align-items: center; place-content: center">
+                                                <i class="fas fa-fire fa-3x icon pr-2"></i><strong
+                                                    class="card-stat-count"> Trending</strong>
+                                            </div><br>
+                                            <p>
+                                                <strong id="topRoomName">
+                                                    <a id="topRoomLink" target="_blank"
+                                                        href="https://dogehouse.tv/rooms/idgoeshere"></a>
+                                                    <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
+                                                </strong>
+                                                containing
+                                                <strong id="topUserCount"><i
+                                                        class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span
+                                                    id="topUserFix">s</span>. <br><span id="timeOnline">Gathering
+                                                    Time...</span>
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <div class="card test">
-                                <div class="card-body fixed-height remove-bg moving-bg zoom-in ex-c border-p">
-                                    <div class="col-md-12">
-                                        <div style="display: flex; align-items: center; place-content: center">
-                                        <i class="fas fa-fire fa-3x icon pr-2"></i><strong class="card-stat-count"> Trending</strong></div><br>
-                                        <p>
-                                        <strong id="topRoomName">
-                                        <a id="topRoomLink" target="_blank" href="https://dogehouse.tv/rooms/idgoeshere"></a>
-                                        <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
-                                        </strong> 
-                                        containing
-                                        <strong id="topUserCount"><i class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span id="topUserFix">s</span>. <br><span id="timeOnline">Gathering Time...</span>
+
+
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">User Activity
+                                        <div class="btn-group pl-2" role="group"
+                                            aria-label="Button group with nested dropdown">
+                                            <div class="btn-group" role="group">
+                                                <button id="userActivityChartTimeframe" type="button"
+                                                    class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                    24h
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="userActivityChartTimeframe">
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">Live</a>
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">24h</a>
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">Week</a>
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">Month</a>
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">All Time</a>
+                                                </div>
+
+                                            </div>
+
+                                            <div class="btn-group" role="group">
+
+                                                <button id="userActivityChartOptions" type="button"
+                                                class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                                aria-haspopup="true" aria-expanded="false">
+                                                Options
+                                                </button>
+                                                <div class="dropdown-menu keep-open dropdown-menu-pad-left" aria-labelledby="userActivityChartOptions">
+                                                    <div class="dropdown-item custom-control custom-checkbox" onclick="optionUpdate(this);">
+                                                        <input type="checkbox" class="custom-control-input" id="dropOptMin">
+                                                        <label class="custom-control-label" for="dropOptMin"><a>Show Minimum</a></label><br>
+                                                      </div>
+                                                      <div class="dropdown-item custom-control custom-checkbox" onclick="optionUpdate(this);">
+                                                        <input type="checkbox" class="custom-control-input" id="dropOptMax">
+                                                        <label class="custom-control-label" for="dropOptMax"><a>Show Maximum</a></label><br>
+                                                      </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas class="respons" id="statsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">Room Activity
+                                        <div class="btn-group pl-2" role="group"
+                                            aria-label="Button group with nested dropdown">
+                                            <div class="btn-group" role="group">
+                                                <button id="roomActivityChartTimeframe" type="button"
+                                                    class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                    24h
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="roomActivityChartTimeframe">
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">Live</a>
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">24h</a>
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">Week</a>
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">Month</a>
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">All
+                                                        Time</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas class="respons" id="roomsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-12 mb-3">
+                                <div class="card test">
+                                    <div class="card-body fixed-height remove-bg moving-bg border-p ex-pink">
+                                        <div class="col-md-12" style="text-align: left;">
+                                            <a><button style="float: right; vertical-align: middle;"
+                                                    class="btn extra-btn-width btn-outline-light mt-3">Bot Statistics <i
+                                                        class="far fa-arrow-alt-circle-right"></i></button></a>
+                                            <a href="https://github.com/dogegarden/dogehouse-js"><button
+                                                    style="float: right; vertical-align: middle;"
+                                                    class="btn extra-btn-width btn-outline-light mr-2 mt-3">Create a Bot
+                                                    <i class="fas fa-plus"></i></button></a>
+
+                                            <i class="fas fa-robot fa-4x icon pr-1"></i> <strong id="botsOnline"
+                                                class="card-stat-count"><i
+                                                    class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
+                                            <p class="pt-1">Provided by <a
+                                                    href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a>.
+                                            </p>
+                                        </div>
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-
-                    <br>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">User Activity                                
-                                    <div class="btn-group pl-2" role="group" aria-label="Button group with nested dropdown">
-                                     <div class="btn-group" role="group">
-                                      <button id="userActivityChartTimeframe" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Live
-                                      </button>
-                                      <div class="dropdown-menu" aria-labelledby="userActivityChartTimeframe">
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Live</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">24h</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Week</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Month</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">All Time</a>
-                                      </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card test">
+                                    <div
+                                        class="card-body fixed-height remove-bg moving-bg stats-hover zoom-in ex-blue border-b">
+                                        <div class="col-md-12">
+                                            <div style="display: flex; align-items: center; place-content: center">
+                                                <i class="fas fa-plus-circle fa-3x icon pr-2"></i><strong
+                                                    class="card-stat-count"> Newest Room</strong>
+                                            </div><br>
+                                            <p>
+                                                <strong id="newestRoom">
+                                                    <a id="newestRoomLink" target="_blank"
+                                                        href="https://dogehouse.tv/rooms/idgoeshere"></a>
+                                                    <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
+                                                </strong>
+                                                containing
+                                                <strong id="newestUserCount"><i
+                                                        class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span
+                                                    id="newestUserFix">s</span>. <br><span
+                                                    id="newestTimeOnline">Gathering Time...</span>
+                                            </p>
+                                        </div>
                                     </div>
-                                  </div>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="statsChart"></canvas>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="card">
-                                <div class="card-header">Room Activity
-                                <div class="btn-group pl-2" role="group" aria-label="Button group with nested dropdown">
-                                    <div class="btn-group" role="group">
-                                     <button id="roomActivityChartTimeframe" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Live
-                                     </button>
-                                     <div class="dropdown-menu" aria-labelledby="roomActivityChartTimeframe">
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Live</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">24h</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Week</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">Month</a>
-                                        <a class="dropdown-item" onclick="dropdownUpdate(this);">All Time</a>
-                                     </div>
-                                   </div>
-                                 </div>
-                                </div>
-                                <div class="card-body">
-                                    <canvas id="roomsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <br>
-                    <div class="row">
-                        <div class="col-sm-12 col-lg-12 mb-3">
-                            <div class="card test">
-                                <div class="card-body fixed-height remove-bg moving-bg border-p ex-pink">
-                                    <div class="col-md-12" style="text-align: left;">
-                                        <a><button style="float: right; vertical-align: middle;" class="btn extra-btn-width btn-outline-light mt-3">Bot Statistics <i class="far fa-arrow-alt-circle-right"></i></button></a>
-                                        <a href="https://github.com/dogegarden/dogehouse-js"><button style="float: right; vertical-align: middle;" class="btn extra-btn-width btn-outline-light mr-2 mt-3">Create a Bot <i class="fas fa-plus"></i></button></a>
-
-                                        <i class="fas fa-robot fa-4x icon pr-1"></i> <strong
-                                            id="botsOnline" class="card-stat-count"><i
-                                                class="fas fa-spinner fa-w-16 fa-spin"></i></strong>
-                                        <p class="pt-1">Provided by <a href="https://github.com/dogegarden/dogehouse.js">dogehouse.js</a> & <a href="https://github.com/dogegarden/dogehouse-api">dogehouse-api</a>.</p>
+                            <div class="col-md-6">
+                                <div class="card test">
+                                    <div
+                                        class="card-body fixed-height remove-bg moving-bg stats-hover zoom-in ex-orange border-o">
+                                        <div class="col-md-12">
+                                            <div style="display: flex; align-items: center; place-content: center">
+                                                <i class="fas fa-history fa-3x icon pr-2"></i><strong
+                                                    class="card-stat-count"> Longest Active Room</strong>
+                                            </div><br>
+                                            <p>
+                                                <strong id="longestRoom">
+                                                    <a id="longestRoomLink" target="_blank"
+                                                        href="https://dogehouse.tv/rooms/idgoeshere"></a>
+                                                    <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
+                                                </strong>
+                                                containing
+                                                <strong id="longestUserCount"><i
+                                                        class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span
+                                                    id="longestUserFix">s</span>. <br><span
+                                                    id="longestTimeOnline">Gathering Time...</span>
+                                            </p>
+                                        </div>
                                     </div>
-                                    </p>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="card test">
-                            <div class="card-body fixed-height remove-bg moving-bg stats-hover zoom-in ex-blue border-b">
-                                <div class="col-md-12">
-                                    <div style="display: flex; align-items: center; place-content: center">
-                                    <i class="fas fa-plus-circle fa-3x icon pr-2"></i><strong class="card-stat-count"> Newest Room</strong></div><br>
-                                    <p>
-                                    <strong id="newestRoom">
-                                    <a id="newestRoomLink" target="_blank" href="https://dogehouse.tv/rooms/idgoeshere"></a>
-                                    <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
-                                    </strong> 
-                                    containing
-                                    <strong id="newestUserCount"><i class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span id="newestUserFix">s</span>. <br><span id="newestTimeOnline">Gathering Time...</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="card test">
-                            <div class="card-body fixed-height remove-bg moving-bg stats-hover zoom-in ex-orange border-o">
-                                <div class="col-md-12">
-                                    <div style="display: flex; align-items: center; place-content: center">
-                                    <i class="fas fa-history fa-3x icon pr-2"></i><strong class="card-stat-count"> Longest Active Room</strong></div><br>
-                                    <p>
-                                    <strong id="longestRoom">
-                                    <a id="longestRoomLink" target="_blank" href="https://dogehouse.tv/rooms/idgoeshere"></a>
-                                    <i class="fas fa-spinner fa-w-16 fa-spin"></i></a>
-                                    </strong> 
-                                    containing
-                                    <strong id="longestUserCount"><i class="fas fa-spinner fa-w-16 fa-spin"></i></strong> user<span id="longestUserFix">s</span>. <br><span id="longestTimeOnline">Gathering Time...</span>
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-12 col-lg-12 mb-3 m-3">
-                        <div class="card test">
-                            <div class="card-body border-p ex-c">
-                                <div class="col-md-12" id="testBots style="text-align: left;">
-                                    <div style="display: flex; align-items: center; place-content: center">
-                                        <i class="fas fa-robot fa-3x icon pr-2"></i><strong class="card-stat-count"> Online Bot List</strong></div>
-                                    <p id="botsProvidingTelem" class="pt-1"><i class="fas fa-spinner fa-w-16 fa-spin"></i></p>
-                                        <div id="testBots"></div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">User/Bots Activity <span
+                                        class="badge bg-danger">New</span>
+                                        <div class="btn-group pl-2" role="group"
+                                            aria-label="Button group with nested dropdown">
+                                            <div class="btn-group" role="group">
+                                                <button id="userActivityChartTimeframe" type="button"
+                                                    class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                    Live
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="userActivityChartTimeframe">
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">Live</a>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </p>
+                                    <div class="card-body">
+                                        <canvas class="respons" id="botuserChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">Users/Rooms Activity <span
+                                            class="badge bg-danger">New</span>
+                                        <div class="btn-group pl-2" role="group"
+                                            aria-label="Button group with nested dropdown">
+                                            <div class="btn-group" role="group">
+                                                <button id="userActivityChartTimeframe" type="button"
+                                                    class="btn btn-secondary dropdown-toggle" data-toggle="dropdown"
+                                                    aria-haspopup="true" aria-expanded="false">
+                                                    Live
+                                                </button>
+                                                <div class="dropdown-menu" aria-labelledby="userActivityChartTimeframe">
+                                                    <a class="dropdown-item" onclick="dropdownUpdate(this);">Live</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas class="respons" id="userroomChart"></canvas>
+                                    </div>
+                                </div>
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-12 mb-3 m-3">
+                                <div class="card test">
+                                    <div class="card-body border-p ex-c">
+                                        <div class="col-md-12" id="testBots style=" text-align: left;">
+                                            <div style="display: flex; align-items: center; place-content: center">
+                                                <i class="fas fa-robot fa-3x icon pr-2"></i><strong
+                                                    class="card-stat-count"> Online Bot List</strong>
+                                            </div>
+                                            <p id="botsProvidingTelem" class="pt-1"><i
+                                                    class="fas fa-spinner fa-w-16 fa-spin"></i></p>
+                                            <div id="testBots"></div>
+                                        </div>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12 col-lg-12 mb-3">
+                                <div class="card test">
+                                    <div class="card-body fixed-height remove-bg moving-bg border-p ex-pink">
+                                        <div class="col-md-12" style="text-align: left;">
+                                            <a><button style="float: right; vertical-align: middle;"
+                                                class="btn extra-btn-width btn-outline-light mt-3">Patreon <i
+                                                class="far fa-arrow-alt-circle-right"></i></button>
+                                            </a>
+
+                                            <i class="fas fa-newspaper fa-4x icon pr-1"></i> <strong id="botsOnline" class="card-stat-count">Supported by <u>your name...</u>.</strong>
+                                            <p class="pt-1">Thank you for supporting us on <a
+                                                    href="https://www.patreon.com/dogegarden?fan_landing=true">patreon</a>, <u>your name...</u>. Get your name here by selecting a tier on our patreon.
+                                            </p>
+                                        </div>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br>
                     </div>
-                </div>
-                <br>
-            </div>
 
-            <%- include('./Components/Footer') %>
+                    <%- include('./Components/Footer') %>
 
-
-                <script src="../public/js/home.js"></script>
-                <script src="../public/js/statistics.js"></script>
-                <script src="../public/js/utils.js"></script>
-        </body>
+                        <script src="../public/js/home.js"></script>
+                        <script src="../public/js/statistics.js"></script>
+                        <script src="../public/js/utils.js"></script>
+            </body>

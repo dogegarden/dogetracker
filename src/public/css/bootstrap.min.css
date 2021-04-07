@@ -2722,8 +2722,8 @@ fieldset:disabled a.btn {
 
 .btn-secondary {
 	color: #fff;
-	background-color: #33404d;
-	border-color: #6c757d
+	background-color: #22272E;
+	border-color: #3e4a55
 }
 
 .btn-secondary:hover {
@@ -3420,10 +3420,14 @@ input[type=submit].btn-block {
 	color: #212529;
 	text-align: left;
 	list-style: none;
-    background-color: rgba(31.008, 40.8, 50.592, var(--tw-bg-opacity));
+    background-color: rgba(20,25,32);
 	background-clip: padding-box;
 	border: 1px solid rgba(0, 0, 0, .15);
-	border-radius: .25rem
+	border-radius: .25rem;
+}
+
+.dropdown-menu-pad-left {
+	padding-left: 10px;
 }
 
 .dropdown-menu-left {
@@ -3587,18 +3591,18 @@ input[type=submit].btn-block {
 	padding: .25rem 1.5rem;
 	clear: both;
 	font-weight: 400;
-	color: #212529;
+	color: #ffffff;
 	text-align: inherit;
 	white-space: nowrap;
 	background-color: transparent;
-	border: 0
+	border: 0;
 }
 
 .dropdown-item:focus,
 .dropdown-item:hover {
 	color: #16181b;
 	text-decoration: none;
-	background-color: #33404d;
+	background-color: rgb(28, 34, 41);
 }
 
 .dropdown-item.active,
@@ -4559,7 +4563,6 @@ input[type=submit].btn-block {
 
 .navbar-brand {
 	display: inline-block;
-	margin-right: 1rem;
 	font-size: 1.25rem;
 	line-height: inherit;
     white-space: nowrap;
