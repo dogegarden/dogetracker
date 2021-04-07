@@ -10,5 +10,5 @@ const Cron = require('./src/util/cron');
         Logger.info(`Express started on on port ${process.env.EXPRESS_PORT}`);
     }, true);
     Cron.setCron();
-//     Cron.autoRunMYSQL();
+     Cron.autoRunMYSQL();
 })()

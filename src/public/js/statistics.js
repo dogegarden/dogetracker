@@ -4,17 +4,39 @@ $(document).ready(function(){
     var labels = [];
     var config = {
         type: 'line',
+        
         data: {
             
             labels: labels,
             datasets: [{
-                label: 'Users',
+                label: 'Average Users',
                 backgroundColor: 'rgba(244, 5, 95, 0.55)',
                 borderColor: '#f4055f',
                 data: [],
-                fill: true,
+                fill: false,
                 lineTension: 0,
-            }]
+            },
+            {
+                label: 'Minimum Users',
+                fill: false,
+                backgroundColor: 'rgba(5, 89, 244, 0.55)',
+                borderColor: 'rgba(5, 89, 244, 0.55)',
+                borderDash: [5, 5],
+                data: [],
+                lineTension: 0,
+
+              },
+              {
+                label: 'Maximum Users',
+                fill: false,
+                backgroundColor: 'rgba(244, 140, 5, 0.55)',
+                borderColor: 'rgba(244, 140, 5, 0.55)',
+                borderDash: [5, 5],
+                data: [],
+                lineTension: 0,
+
+              }
+            ]
         },
         options: {
             responsive: true,
@@ -32,11 +54,14 @@ $(document).ready(function(){
                 duration: 0  
             },
             legend: {
-                display: false
+                display: true,
+                labels: {
+                    filter: (legendItem, data) => data.datasets[0].data[legendItem.index] != 0
+                  }
             },
             hover: {
                 mode: 'nearest',
-                intersect: true
+                intersect: false
             },
             tooltips: {
                 callbacks: {
@@ -89,7 +114,7 @@ $(document).ready(function(){
                 backgroundColor: 'rgba(244, 5, 95, 0.55)',
                 borderColor: '#f4055f',
                 data: [],
-                fill: true,
+                fill: false,
                 lineTension: 0,
             }]
         },
@@ -109,11 +134,14 @@ $(document).ready(function(){
                 duration: 0  
             },
             legend: {
-                display: false
+                display: true,
+                labels: {
+                    filter: (legendItem, data) => data.datasets[0].data[legendItem.index] != 0
+                  }
             },
             hover: {
                 mode: 'nearest',
-                intersect: true
+                intersect: false
             },
             tooltips: {
                 callbacks: {
@@ -153,10 +181,6 @@ $(document).ready(function(){
 
         var ctxRooms = document.getElementById('roomsChart').getContext('2d');
         window.chartRooms = new Chart(ctxRooms, config);
-
-
-
-
         
     //     // Outages
     //     var labelsOutages = [];

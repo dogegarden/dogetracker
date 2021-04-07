@@ -18,7 +18,9 @@ class App {
         this.app.engine('e', require('ejs').renderFile)
         this.app.set('view engine', 'ejs')
         this.app.set('views', path.join(__dirname, '..', 'views'))
-        this.app.use(cors());
+        this.app.use(cors({
+            origin: "*"
+        }));
         this.app.use('/public', express.static(path.join(__dirname, '..', 'public')));
         this.app.use(cookieParser());
         this.app.use(express.json())

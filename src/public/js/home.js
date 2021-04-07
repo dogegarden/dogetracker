@@ -1,8 +1,62 @@
 let lookup = ['Live', '24h', 'Week', 'Month', 'All Time'];
 
+$('.dropdown-menu.keep-open').on('click', function (e) {
+    e.stopPropagation();
+});
+
+function toggleFullScreen() {
+    if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen();
+        $(".fsl").addClass('min-w');
+
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen(); 
+        $(".fsl").removeClass('min-w');
+
+      }
+    }
+  }
+
 function dropdownUpdate(element) {
     document.getElementById(element.parentElement.getAttribute('aria-labelledby')).innerText = element.innerText;
     changeDataset(((element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartTimeframe') ? 'statsChart' : 'roomsChart'), element.innerText)
+}
+
+function optionUpdate(element) {
+    if (element.innerText.trim() != 'Show Maximum' && element.innerText.trim() != 'Show Minimum') {
+        console.log(`ERROR: Received: ${element.innerText}`);
+    } else {        
+        // console.log(element.innerText)
+        // console.log(element.parentElement.parentElement.parentElement.children[0].innerText.trim())
+        // console.log(chartConfig.options["_"+element.parentElement.parentElement.parentElement.children[0].innerText.trim()])
+        let canvasID = ((element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartOptions') ? 'statsChart' : 'roomsChart');
+        let configIndex = 0;
+        let opt = ["dropOptMin","dropOptMax"]
+        if (element.innerText.trim() == 'Show Maximum') configIndex = 1;
+        let timeFrame = element.parentElement.parentElement.parentElement.children[0].innerText.trim();
+        window.chartConfig.options["_"+timeFrame][Object.keys(window.chartConfig.options["_"+timeFrame])[configIndex]] = document.getElementById(opt[configIndex]).checked;
+        // Add or remove
+        let dataName = ``;
+        if (canvasID == 'statsChart') {
+            dataName = 'totalOnline'
+            curChart = window.chart;
+        } else {
+            dataName = 'totalRooms'
+            curChart = window.chartRooms;
+        }
+        let isHidden = (document.getElementById(opt[configIndex]).checked == true) ? false : true;
+        curChart.data.datasets[(configIndex+1)]._meta[0].hidden = isHidden;
+        // if (document.getElementById(opt[configIndex]).checked == true) {
+        //     // Add the data
+        //     // curChart.data.datasets[(configIndex+1)].data = statsConfig[(5+configIndex)].map(({ [`${dataName}`]: val }) => val);    
+            
+        // } else {
+        //     // Remove the data
+        //     // curChart.data.datasets[(configIndex+1)].data = [];
+        // }
+        curChart.update();
+    }
 }
 
 function changeDataset(canvasID, value) {
@@ -29,61 +83,147 @@ function changeDataset(canvasID, value) {
         // Live
         curChart.data.labels = statsConfig[0].map(({ [`statsTime`]: val }) => val);
         curChart.options.scales.xAxes[0].scaleLabel.labelString = "Seconds";
+        curChart.options.tooltips.callbacks.title = function(t, d) {
+            return "Time: "+d.labels[t[0].index]+" seconds";
+         }
         // window.chartConfig.step = 0;
         // Consider storing this data in the background
     } else if (lookupIndex == 1) {
         // 24h
-        curChart.data.labels = statsConfig[1].map(({ [`statsTime`]: val }) => new Date(val).toLocaleTimeString());
+        curChart.data.labels = statsConfig[1].map(({ [`statsTime`]: val }) => new Date(val).getHours());
+        curChart.options.tooltips.callbacks.title = function(t, d) {
+            return "Time: "+d.labels[t[0].index]+" hours";
+         }
     } else if (lookupIndex == 2) {
         // Weeks
         let days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        curChart.data.labels = statsConfig[2].map(({ [`statsTime`]: val }) => days[new Date(val).getDay()]+" "+new Date(val).toLocaleTimeString());
+        curChart.data.labels = statsConfig[2].map(({ [`statsTime`]: val }) => days[new Date(val).getDay()]+" "+new Date(val).getHours()+":"+new Date(val).getMinutes());
+        curChart.options.tooltips.callbacks.title = function(t, d) {
+            return "Time: "+d.labels[t[0].index];
+         }
     } else if (lookupIndex == 3) {
         // Month
         curChart.data.labels = statsConfig[3].map(({ [`statsTime`]: val }) => new Date(val).toLocaleDateString());
+        curChart.options.tooltips.callbacks.title = function(t, d) {
+            return "Time: "+d.labels[t[0].index];
+         }
     } else if (lookupIndex == 4) {
         // All Time
         // Store start date as value and work out day, week, month, year
         curChart.data.labels = statsConfig[4].map(({ [`statsTime`]: val }) => new Date(val).toLocaleDateString());
+        curChart.options.tooltips.callbacks.title = function(t, d) {
+            return "Time: "+d.labels[t[0].index];
+         }
     } else {
-        console.log(`Error | lookupIndex ${lookupIndex}`);
+        console.log(`Error | lookupIndex ${lookupIndex} | Input: canvasID ${canvasID} , value ${value}`);
     }
     curChart.update();
 }
 
 $(document).ready(function () {
 
-    window.statsConfig = [[],[],[],[],[]];
+    // [ [ live ], [ 24h - average ], [ week - average ], [ month - average ], [ alltime - average ], [ 24h - min ], [ 24h - max ] ]
+    window.statsConfig = [[],[],[],[],[],[],[]];
 
     function getLongTermData() {
         $.ajax({
             url: '/api/mysql?time=24h',
             success: (payload) => {
-                statsConfig[1] = payload
+                // console.log(payload);
+                // Get hours from each
+                // Group by hours
+                // find min, max, average
+                // push average to data
+                // min and max to another index of statsConfig
+
+                let avgData = [];
+                let minData = [];
+                let maxData = [];
+                let dmap = new Map();
+
+                payload.forEach(function(curData) {
+                    let timestamp = new Date(curData.statsTime);
+                    let h = timestamp.getHours();
+                    let m = timestamp.getMinutes();
+                    if (!dmap[h]) dmap[h]={};
+                    dmap[h][m] = curData;
+                })
+                Object.getOwnPropertyNames(dmap).length
+                for (i=0; i<Object.getOwnPropertyNames(dmap).length; i++) {
+                    let avgR = 0;
+                    let avgO = 0;
+                    let minR = 0;
+                    let minO = 0;
+                    let maxR = 0;
+                    let maxO = 0;
+                    for (j=0; j<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length; j++) {
+                        a = dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]];
+                        if (j == 0) {
+                            minR = a.totalRooms;
+                            minO = a.totalOnline;
+                        }
+                        avgR += a.totalRooms;
+                        avgO += a.totalOnline;
+                        if (minR > a.totalRooms) minR = a.totalRooms;
+                        if (minO > a.totalOnline) minO = a.totalOnline;
+                        if (maxR < a.totalRooms) maxR = a.totalRooms;
+                        if (maxO < a.totalOnline) maxO = a.totalOnline;
+                        if (j == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length - 1) {
+                            avgR = Math.round(avgR / (j+1) * 2)/2;
+                            avgO = Math.round(avgO / (j+1) * 2)/2;
+                            t = a.statsTime;
+                            time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
+                            avgData.push({
+                                'totalRooms' : avgR,
+                                'totalOnline' : avgO,
+                                'statsTime' : time
+                            })
+                            minData.push({
+                                'totalRooms' : minR,
+                                'totalOnline' : minO,
+                                'statsTime' : time
+                            })
+                            maxData.push({
+                                'totalRooms' : maxR,
+                                'totalOnline' : maxO,
+                                'statsTime' : time
+                            })
+                        }
+                    }
+                }
+
+                statsConfig[1] = avgData;
+                statsConfig[5] = minData;
+                statsConfig[6] = maxData;
+                chart.data.datasets[1].data = statsConfig[5].map(({ [`totalOnline`]: val }) => val);
+                chart.data.datasets[2].data = statsConfig[6].map(({ [`totalOnline`]: val }) => val);
+                chart.data.datasets[1]._meta[0].hidden = true;
+                chart.data.datasets[2]._meta[0].hidden = true;
+                changeDataset('statsChart', '24h');
+                changeDataset('roomsChart', '24h');
             }
         })
         $.ajax({
             url: '/api/mysql?time=week',
             success: (payload) => {
-                statsConfig[2] = payload
+                statsConfig[2] = payload;
             }
         })
         $.ajax({
             url: '/api/mysql?time=month',
             success: (payload) => {
-                statsConfig[3] = payload
+                statsConfig[3] = payload;
             }
         })
         $.ajax({
             url: '/api/mysql?time=alltime',
             success: (payload) => {
-                statsConfig[4] = payload
+                statsConfig[4] = payload;
             }
         })
     }
 
     getLongTermData();
-
 
     function update() {
         $.ajax({
@@ -111,7 +251,7 @@ $(document).ready(function () {
                 document.getElementById('newestRoom').innerHTML = payload.newestRoom.name;
                 document.getElementById('newestUserCount').innerHTML = payload.newestRoom.listeners;
                 document.getElementById('newestUserFix').innerText = (payload.newestRoom.listeners == 1) ? '' : 's';
-                document.getElementById('botsProvidingTelem').innerText = payload.totalBotsSendingTelemetry + ' bots providing telemetry'
+                document.getElementById('botsProvidingTelem').innerHTML = payload.totalBotsSendingTelemetry + '/' + payload.totalBotsOnline + ' bots providing telemetry via <a href="https://github.com/dogegarden/dogehouse.js">dogehouse.js</a> & <a href="https://github.com/Arthurdw/dogehouse.py">dogehouse.py</>'
 
                 if (payload.totalBotsOnline == 1) {
                     document.getElementById('botsOnline').innerHTML = payload.totalBotsOnline + ' Bot Online';
@@ -149,7 +289,7 @@ $(document).ready(function () {
 
                     function changeText(text = 'Generating...') {
 
-                        element.innerHTML = "Room Status: " + text + " (" + (days === 0 ? "" : "Days: " + days + " | ") + "Hours: " + hours + " | Minutes: " + minutes + ")";
+                        element.innerHTML = text + " (" + (days === 0 ? "" : "Days: " + days + " | ") + "Hours: " + hours + " | Minutes: " + minutes + ")";
 
                         // shortened text is 217
 
@@ -209,7 +349,28 @@ $(document).ready(function () {
                     window.chartConfig = {
                         'start': new Date().valueOf(),
                         'step': 0,
-                        'limit': 100
+                        'limit': 100,
+                        'options' : {
+                            '_live' : {
+                                // Todo
+                            },
+                            '_24h' : {
+                                'min' : false,
+                                'max' : false
+                            },
+                            '_week' : {
+                                'min' : false,
+                                'max' : false
+                            },
+                            '_month' : {
+                                'min' : false,
+                                'max' : false
+                            },
+                            '_alltime' : {
+                                'min' : false,
+                                'max' : false
+                            }
+                        }
                     }
                 };
 
@@ -225,7 +386,7 @@ $(document).ready(function () {
                 
                 // Check for removal
                 if (window.chart.data.datasets[0].data.length >= window.chartConfig.limit) {
-                    statsConfig[lookupIndex] = statsConfig[lookupIndex].slice(1);
+                    statsConfig[0] = statsConfig[0].slice(1);
                 }
 
                 // User Acitivty Chart
@@ -237,6 +398,71 @@ $(document).ready(function () {
                 // Update
                 window.chart.update();
                 window.chartRooms.update();
+
+                var userRoomChart = document.getElementById("botuserChart");
+                var userRoomData = {
+                    labels: [
+                        "Users Online",
+                        "Bots Online"
+                    ],
+                    datasets: [
+                        
+                        {
+                            borderColor: false,
+                            data: [payload.totalOnline - payload.totalBotsOnline, payload.totalBotsOnline],
+                            backgroundColor: [
+                                "rgba(244, 5, 95, 0.55)",
+                                "rgba(5, 89, 244, 0.55)",
+                                "rgba(244, 140, 5, 0.55)"
+                            ]
+                        }]
+                };
+        
+                let UserBotChart = new Chart(userRoomChart, {
+                type: 'doughnut',
+                data: userRoomData,
+                options: {
+                    animation: false,
+                    legend: {
+                        color: '#cacaca'
+                    },
+                    defaultFontColor: '#000'
+                }
+                });
+
+                // rooms / users
+                var userRoomChart = document.getElementById("userroomChart");
+                var userRoomData = {
+                    labels: [
+                        "Users Online",
+                        "Rooms",
+                        "Bots Online"
+                    ],
+                    datasets: [
+                        
+                        {
+                            borderColor: false,
+                            data: [payload.totalOnline - payload.totalBotsOnline, payload.totalRooms, payload.totalBotsOnline],
+                            backgroundColor: [
+                                "rgba(244, 5, 95, 0.55)",
+                                "rgba(5, 89, 244, 0.55)",
+                                "rgba(244, 140, 5, 0.55)"
+                            ]
+                        }]
+                };
+        
+                let UserRoomDoughnutChart = new Chart(userRoomChart, {
+                type: 'doughnut',
+                data: userRoomData,
+                options: {
+                    segmentShowStroke: false,
+                    animation: false,
+                    legend: {
+                        color: '#cacaca'
+                    },
+                }
+                });
+
             }
         });
         $.ajax({
@@ -298,6 +524,21 @@ $(document).ready(function () {
         })
     }
 
+    function checkAPIStatus() {
+        try {
+            $.ajax({
+                url: 'https://api.dogehouse.xyz',
+                timeout: 1500,
+                error: function() {
+                    $("#api-alert").removeClass('show');
+                },
+            })
+        } catch(err) {
+            //no 1 cares about err so we ignore it :)
+        }
+    }
+    checkAPIStatus()
     update();
     setInterval(update, 5000);
+    setInterval(checkAPIStatus, 10000);
 });
