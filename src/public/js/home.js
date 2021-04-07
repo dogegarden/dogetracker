@@ -77,6 +77,8 @@ function changeDataset(canvasID, value) {
         // (new Date).toLocaleTimeString()
         curChart.data.datasets[0].data = statsConfig[lookupIndex].map(({ [`${dataName}`]: val }) => val);
         curChart.options.scales.xAxes[0].scaleLabel.labelString = "Time";
+        curChart.data.datasets[1].data = [];
+        curChart.data.datasets[2].data = [];
     }
 
     if (lookupIndex == 0) {
@@ -90,6 +92,8 @@ function changeDataset(canvasID, value) {
         // Consider storing this data in the background
     } else if (lookupIndex == 1) {
         // 24h
+        chart.data.datasets[1].data = statsConfig[5].map(({ [`totalOnline`]: val }) => val);
+        chart.data.datasets[2].data = statsConfig[6].map(({ [`totalOnline`]: val }) => val);
         curChart.data.labels = statsConfig[1].map(({ [`statsTime`]: val }) => new Date(val).getHours());
         curChart.options.tooltips.callbacks.title = function(t, d) {
             return "Time: "+d.labels[t[0].index]+" hours";
