@@ -583,6 +583,20 @@ pre code {
 	margin-left: auto
 }
 
+@media (max-width:576px) {
+	.button-grp-crb {
+		display: none;
+	}
+
+	.icon {
+		display: none;
+	}
+
+	.uuid {
+		display: none;
+	}
+}
+
 @media (min-width:576px) {
 	.container,
 	.container-sm {
@@ -614,6 +628,26 @@ pre code {
 	.container-sm,
 	.container-xl {
 		max-width: 1140px
+	}
+}
+
+@media (min-width:1400px) {
+	.container,
+	.container-lg,
+	.container-md,
+	.container-sm,
+	.container-xl {
+		max-width: 1320px
+	}
+}
+
+@media (min-width:1880px) {
+	.container,
+	.container-lg,
+	.container-md,
+	.container-sm,
+	.container-xl {
+		max-width: 1500px
 	}
 }
 

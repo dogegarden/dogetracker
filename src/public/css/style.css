@@ -16,7 +16,7 @@ body {
 }
 
 
-#api-alert:not(.show) {
+#api-alert:not(.show), #ver-alert:not(.show) {
   opacity: 1;
 }
 
