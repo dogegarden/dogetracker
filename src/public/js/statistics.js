@@ -57,7 +57,14 @@ $(document).ready(function(){
                 display: true,
                 labels: {
                     filter: (legendItem, data) => data.datasets[0].data[legendItem.index] != 0
-                  }
+                },
+                onClick: function(e,l) {
+                    window.chartConfig.options[validOptions[l.datasetIndex].slice(5,8).toLowerCase()] = l.hidden;
+                    window.chart.data.datasets[l.datasetIndex]._meta[0].hidden = !(l.hidden);
+                    saveSettings(window.chartConfig);
+                    readDropDownSettings();
+                    window.chart.update();
+                }
             },
             hover: {
                 mode: 'nearest',
@@ -110,13 +117,34 @@ $(document).ready(function(){
         data: {
             labels: labelsRooms,
             datasets: [{
-                label: 'Rooms',
+                label: 'Average Rooms',
                 backgroundColor: 'rgba(244, 5, 95, 0.55)',
                 borderColor: '#f4055f',
                 data: [],
                 fill: false,
                 lineTension: 0,
-            }]
+            },
+            {
+                label: 'Minimum Rooms',
+                fill: false,
+                backgroundColor: 'rgba(5, 89, 244, 0.55)',
+                borderColor: 'rgba(5, 89, 244, 0.55)',
+                borderDash: [5, 5],
+                data: [],
+                lineTension: 0,
+
+              },
+              {
+                label: 'Maximum Rooms',
+                fill: false,
+                backgroundColor: 'rgba(244, 140, 5, 0.55)',
+                borderColor: 'rgba(244, 140, 5, 0.55)',
+                borderDash: [5, 5],
+                data: [],
+                lineTension: 0,
+
+              }
+            ]
         },
         options: {
             responsive: true,
@@ -137,7 +165,14 @@ $(document).ready(function(){
                 display: true,
                 labels: {
                     filter: (legendItem, data) => data.datasets[0].data[legendItem.index] != 0
-                  }
+                },
+                onClick: function(e,l) {
+                    window.chartConfig.options[validOptions[l.datasetIndex].slice(5,8).toLowerCase()+"R"] = l.hidden;
+                    window.chartRooms.data.datasets[l.datasetIndex]._meta[1].hidden = !(l.hidden);
+                    saveSettings(window.chartConfig);
+                    readDropDownSettings();
+                    window.chartRooms.update();
+                }
             },
             hover: {
                 mode: 'nearest',

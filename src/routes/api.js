@@ -53,6 +53,16 @@ class API extends Router {
             }
         })
 
+        this.router.get('/version', async (req, res) => {
+            try {
+                let packageConf = require('../../package.json')
+                res.json(packageConf)
+
+            } catch (e) {
+                console.log(e)
+            }
+        })
+
         this.router.get('/bots', async (req, res) => {
             try {
                 let bots = await axios.get('https://api.dogehouse.xyz/v1/bots?dogestats')

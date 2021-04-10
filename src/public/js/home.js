@@ -1,8 +1,36 @@
 let lookup = ['Live', '24h', 'Week', 'Month', 'All Time'];
+let validOptions = ['Show Average','Show Minimum','Show Maximum'];
+let globalVersion;
 
 $('.dropdown-menu.keep-open').on('click', function (e) {
     e.stopPropagation();
 });
+
+window.onload = function () {
+    var loadTime = window.performance.timing.domContentLoadedEventEnd-window.performance.timing.navigationStart; 
+    console.log('Page load time is '+ loadTime);
+    document.getElementById('loadTime').innerHTML = '<i class="fas fa-stopwatch"></i> ' + loadTime + 'ms';
+
+}
+
+function compare(previousVersion, currentVersion){
+    var previousVerArr = previousVersion.split('.').map(Number); 
+    var currentVerArr = currentVersion.split('.').map(Number);
+  
+    if (currentVerArr[0] > previousVerArr[0]) {
+      return "major";
+    } else if (currentVerArr[0] == previousVerArr[0] && currentVerArr[1] > previousVerArr[1]) {
+      return "minor";
+    } else if (currentVerArr[0] == previousVerArr[0] && currentVerArr[1] == previousVerArr[1] && currentVerArr[2] > previousVerArr[2]) {
+      return "patch";
+    } else {
+      return "none";
+    };
+};
+
+function saveSettings(settings) {
+    if (localStorage && typeof settings == 'object') localStorage.setItem('dhSettings', JSON.stringify(settings));
+};
 
 function toggleFullScreen() {
     if (!document.fullscreenElement) {
@@ -16,7 +44,20 @@ function toggleFullScreen() {
 
       }
     }
-  }
+}
+
+function readDropDownSettings() {
+    document.getElementById('dropOptAve').checked = window.chartConfig.options.ave;
+    document.getElementById('dropOptMin').checked = window.chartConfig.options.min;
+    document.getElementById('dropOptMax').checked = window.chartConfig.options.max;
+    // Room Chart
+}
+
+function verReload() {
+    window.chartConfig.version = globalVersion;
+    saveSettings(window.chartConfig);
+    location.reload(true);
+}
 
 function dropdownUpdate(element) {
     document.getElementById(element.parentElement.getAttribute('aria-labelledby')).innerText = element.innerText;
@@ -24,18 +65,21 @@ function dropdownUpdate(element) {
 }
 
 function optionUpdate(element) {
-    if (element.innerText.trim() != 'Show Maximum' && element.innerText.trim() != 'Show Minimum') {
+    if (validOptions.indexOf(element.innerText.trim()) == -1) {
         console.log(`ERROR: Received: ${element.innerText}`);
     } else {        
-        // console.log(element.innerText)
         // console.log(element.parentElement.parentElement.parentElement.children[0].innerText.trim())
         // console.log(chartConfig.options["_"+element.parentElement.parentElement.parentElement.children[0].innerText.trim()])
-        let canvasID = ((element.parentElement.getAttribute('aria-labelledby') == 'userActivityChartOptions') ? 'statsChart' : 'roomsChart');
-        let configIndex = 0;
-        let opt = ["dropOptMin","dropOptMax"]
-        if (element.innerText.trim() == 'Show Maximum') configIndex = 1;
-        let timeFrame = element.parentElement.parentElement.parentElement.children[0].innerText.trim();
-        window.chartConfig.options["_"+timeFrame][Object.keys(window.chartConfig.options["_"+timeFrame])[configIndex]] = document.getElementById(opt[configIndex]).checked;
+        let canvasID = 'statsChart';
+        let isRoomCheck = '';
+        if (element.parentElement.getAttribute('aria-labelledby') == 'roomActivityChartOptions') {
+            canvasID = 'roomsChart';
+            isRoomCheck = 'R';
+        }
+        let configIndex = validOptions.indexOf(element.innerText.trim());
+        let miniOpt = validOptions[configIndex].slice(5,8)+isRoomCheck;
+        console.log(`MiniOpt: ${miniOpt} | miniOptD: dropOpt${miniOpt}`)
+        window.chartConfig.options[miniOpt.toLowerCase()] = document.getElementById("dropOpt"+miniOpt).checked;
         // Add or remove
         let dataName = ``;
         if (canvasID == 'statsChart') {
@@ -45,16 +89,9 @@ function optionUpdate(element) {
             dataName = 'totalRooms'
             curChart = window.chartRooms;
         }
-        let isHidden = (document.getElementById(opt[configIndex]).checked == true) ? false : true;
-        curChart.data.datasets[(configIndex+1)]._meta[0].hidden = isHidden;
-        // if (document.getElementById(opt[configIndex]).checked == true) {
-        //     // Add the data
-        //     // curChart.data.datasets[(configIndex+1)].data = statsConfig[(5+configIndex)].map(({ [`${dataName}`]: val }) => val);    
-            
-        // } else {
-        //     // Remove the data
-        //     // curChart.data.datasets[(configIndex+1)].data = [];
-        // }
+        let isHidden = !(document.getElementById(isRoomCheck+"dropOpt"+miniOpt).checked);
+        curChart.data.datasets[configIndex]._meta[0].hidden = isHidden;
+        saveSettings(window.chartConfig);
         curChart.update();
     }
 }
@@ -77,8 +114,13 @@ function changeDataset(canvasID, value) {
         // (new Date).toLocaleTimeString()
         curChart.data.datasets[0].data = statsConfig[lookupIndex].map(({ [`${dataName}`]: val }) => val);
         curChart.options.scales.xAxes[0].scaleLabel.labelString = "Time";
-        curChart.data.datasets[1].data = [];
-        curChart.data.datasets[2].data = [];
+        if (lookupIndex > 0) {
+            curChart.data.datasets[1].data = statsConfig[lookupIndex*2+3].map(({ [`${dataName}`]: val }) => val);
+            curChart.data.datasets[2].data = statsConfig[lookupIndex*2+4].map(({ [`${dataName}`]: val }) => val);
+        } else {
+            curChart.data.datasets[1].data = [];   
+            curChart.data.datasets[2].data = [];   
+        }
     }
 
     if (lookupIndex == 0) {
@@ -92,8 +134,6 @@ function changeDataset(canvasID, value) {
         // Consider storing this data in the background
     } else if (lookupIndex == 1) {
         // 24h
-        chart.data.datasets[1].data = statsConfig[5].map(({ [`totalOnline`]: val }) => val);
-        chart.data.datasets[2].data = statsConfig[6].map(({ [`totalOnline`]: val }) => val);
         curChart.data.labels = statsConfig[1].map(({ [`statsTime`]: val }) => new Date(val).getHours());
         curChart.options.tooltips.callbacks.title = function(t, d) {
             return "Time: "+d.labels[t[0].index]+" hours";
@@ -124,85 +164,114 @@ function changeDataset(canvasID, value) {
     curChart.update();
 }
 
+function generateAveMinMax(payload) {
+    let aveData = [];
+    let minData = [];
+    let maxData = [];
+    let dmap = new Map();
+
+    payload.forEach(function(curData) {
+        let timestamp = new Date(curData.statsTime);
+        let h = timestamp.getHours();
+        let m = timestamp.getMinutes();
+        if (!dmap[h]) dmap[h]={};
+        dmap[h][m] = curData;
+    })
+    Object.getOwnPropertyNames(dmap).length
+    for (i=0; i<Object.getOwnPropertyNames(dmap).length; i++) {
+        let aveR = 0;
+        let aveO = 0;
+        let minR = 0;
+        let minO = 0;
+        let maxR = 0;
+        let maxO = 0;
+        for (j=0; j<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length; j++) {
+            a = dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]];
+            if (j == 0) {
+                minR = a.totalRooms;
+                minO = a.totalOnline;
+            }
+            aveR += a.totalRooms;
+            aveO += a.totalOnline;
+            if (minR > a.totalRooms) minR = a.totalRooms;
+            if (minO > a.totalOnline) minO = a.totalOnline;
+            if (maxR < a.totalRooms) maxR = a.totalRooms;
+            if (maxO < a.totalOnline) maxO = a.totalOnline;
+            if (j == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length - 1) {
+                aveR = Math.round(aveR / (j+1) * 2)/2;
+                aveO = Math.round(aveO / (j+1) * 2)/2;
+                t = a.statsTime;
+                time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
+                aveData.push({
+                    'totalRooms' : aveR,
+                    'totalOnline' : aveO,
+                    'statsTime' : time
+                })
+                minData.push({
+                    'totalRooms' : minR,
+                    'totalOnline' : minO,
+                    'statsTime' : time
+                })
+                maxData.push({
+                    'totalRooms' : maxR,
+                    'totalOnline' : maxO,
+                    'statsTime' : time
+                })
+            }
+        }
+    }
+    return [aveData, minData, maxData];
+}
+
 $(document).ready(function () {
 
-    // [ [ live ], [ 24h - average ], [ week - average ], [ month - average ], [ alltime - average ], [ 24h - min ], [ 24h - max ] ]
-    window.statsConfig = [[],[],[],[],[],[],[]];
+    // Load settings from localStorage
+    if (localStorage) {
+        var savedExploitSettings = localStorage.getItem('dhSettings');
+        if (savedExploitSettings != null) {
+            window.chartConfig =  JSON.parse(localStorage.getItem('dhSettings'));
+            window.chartConfig.start = new Date().valueOf();
+            window.chartConfig.step = 0;
+        }
+    }
+
+    // Get version info
+    $.ajax({
+        url: '/api/version?dogestats',
+        success: (payload) => {
+            globalVersion = payload.version;
+                if (localStorage) {
+                    if (savedExploitSettings != null) {
+                        // Check version
+                        if (window.chartConfig.version != globalVersion) {
+                            // Show message to update / reload page.
+                            // location.reload(true);
+                            updateType = compare(window.chartConfig.version, globalVersion);
+                            console.log(`Latest Version: ${globalVersion} | Current Version: ${window.chartConfig.version} | UpdateType: ${updateType}`);
+                            document.getElementById("ver-alert").classList.remove("show");
+                        }
+                    }
+                }
+        } 
+    })
+
+    // [ [ live ], [ 24h - average ], [ week - average ], [ month - average ], [ alltime - average ], [ 24h - min ], [ 24h - max ], [ week - min ], [ week - max ], [ month - min ], [ month - max ], [ alltime - min ], [ alltime - max ] ]
+    window.statsConfig = [[],[],[],[],[],[],[],[],[],[],[],[],[]];
 
     function getLongTermData() {
         $.ajax({
             url: '/api/mysql?time=24h',
             success: (payload) => {
                 // console.log(payload);
-                // Get hours from each
-                // Group by hours
-                // find min, max, average
-                // push average to data
-                // min and max to another index of statsConfig
+                let arrays = generateAveMinMax(payload);
+                statsConfig[1] = arrays[0];
+                statsConfig[5] = arrays[1];
+                statsConfig[6] = arrays[2];
 
-                let avgData = [];
-                let minData = [];
-                let maxData = [];
-                let dmap = new Map();
-
-                payload.forEach(function(curData) {
-                    let timestamp = new Date(curData.statsTime);
-                    let h = timestamp.getHours();
-                    let m = timestamp.getMinutes();
-                    if (!dmap[h]) dmap[h]={};
-                    dmap[h][m] = curData;
-                })
-                Object.getOwnPropertyNames(dmap).length
-                for (i=0; i<Object.getOwnPropertyNames(dmap).length; i++) {
-                    let avgR = 0;
-                    let avgO = 0;
-                    let minR = 0;
-                    let minO = 0;
-                    let maxR = 0;
-                    let maxO = 0;
-                    for (j=0; j<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length; j++) {
-                        a = dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]];
-                        if (j == 0) {
-                            minR = a.totalRooms;
-                            minO = a.totalOnline;
-                        }
-                        avgR += a.totalRooms;
-                        avgO += a.totalOnline;
-                        if (minR > a.totalRooms) minR = a.totalRooms;
-                        if (minO > a.totalOnline) minO = a.totalOnline;
-                        if (maxR < a.totalRooms) maxR = a.totalRooms;
-                        if (maxO < a.totalOnline) maxO = a.totalOnline;
-                        if (j == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length - 1) {
-                            avgR = Math.round(avgR / (j+1) * 2)/2;
-                            avgO = Math.round(avgO / (j+1) * 2)/2;
-                            t = a.statsTime;
-                            time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
-                            avgData.push({
-                                'totalRooms' : avgR,
-                                'totalOnline' : avgO,
-                                'statsTime' : time
-                            })
-                            minData.push({
-                                'totalRooms' : minR,
-                                'totalOnline' : minO,
-                                'statsTime' : time
-                            })
-                            maxData.push({
-                                'totalRooms' : maxR,
-                                'totalOnline' : maxO,
-                                'statsTime' : time
-                            })
-                        }
-                    }
-                }
-
-                statsConfig[1] = avgData;
-                statsConfig[5] = minData;
-                statsConfig[6] = maxData;
-                chart.data.datasets[1].data = statsConfig[5].map(({ [`totalOnline`]: val }) => val);
-                chart.data.datasets[2].data = statsConfig[6].map(({ [`totalOnline`]: val }) => val);
-                chart.data.datasets[1]._meta[0].hidden = true;
-                chart.data.datasets[2]._meta[0].hidden = true;
+                // Setup
+                chart.data.datasets[0]._meta[0].hidden = !window.chartConfig.options.ave;
+                chart.data.datasets[1]._meta[0].hidden = !window.chartConfig.options.min;
+                chart.data.datasets[2]._meta[0].hidden = !window.chartConfig.options.max;
                 changeDataset('statsChart', '24h');
                 changeDataset('roomsChart', '24h');
             }
@@ -210,19 +279,28 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/mysql?time=week',
             success: (payload) => {
-                statsConfig[2] = payload;
+                let arrays = generateAveMinMax(payload);
+                statsConfig[2] = arrays[0];
+                statsConfig[7] = arrays[1];
+                statsConfig[8] = arrays[2];
             }
         })
         $.ajax({
             url: '/api/mysql?time=month',
             success: (payload) => {
-                statsConfig[3] = payload;
+                let arrays = generateAveMinMax(payload);
+                statsConfig[3] = arrays[0];
+                statsConfig[9] = arrays[1];
+                statsConfig[10] = arrays[2];
             }
         })
         $.ajax({
             url: '/api/mysql?time=alltime',
             success: (payload) => {
-                statsConfig[4] = payload;
+                let arrays = generateAveMinMax(payload);
+                statsConfig[4] = arrays[0];
+                statsConfig[11] = arrays[1];
+                statsConfig[12] = arrays[2];
             }
         })
     }
@@ -354,29 +432,20 @@ $(document).ready(function () {
                         'start': new Date().valueOf(),
                         'step': 0,
                         'limit': 100,
+                        'version' : globalVersion,
                         'options' : {
-                            '_live' : {
-                                // Todo
-                            },
-                            '_24h' : {
-                                'min' : false,
-                                'max' : false
-                            },
-                            '_week' : {
-                                'min' : false,
-                                'max' : false
-                            },
-                            '_month' : {
-                                'min' : false,
-                                'max' : false
-                            },
-                            '_alltime' : {
-                                'min' : false,
-                                'max' : false
-                            }
+                            'ave' : true,
+                            'min' : false,
+                            'max' : false,
+                            'aveR' : true,
+                            'minR' : false,
+                            'maxR' : false
                         }
                     }
                 };
+                saveSettings(window.chartConfig);
+                // Read settings
+                readDropDownSettings();
 
                 // Stats config
                 statsConfig[0].push({

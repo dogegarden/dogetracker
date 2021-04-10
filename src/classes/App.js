@@ -53,9 +53,12 @@ class App {
 
         // routes below...
 
+        let packageConf = require('../../package.json')
+
         this.app.get('/', function (req, res) {
             res.render('index.ejs', {
                 path: req.path,
+                version: packageConf.version
             })
         })
 
