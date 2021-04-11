@@ -1,6 +1,6 @@
 {
   "name": "dogegarden-stats",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "An open-source site to provide data and statistics about dogehouse.tv.",
   "main": "index.js",
   "scripts": {

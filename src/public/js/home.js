@@ -50,6 +50,9 @@ function readDropDownSettings() {
     document.getElementById('dropOptAve').checked = window.chartConfig.options.ave;
     document.getElementById('dropOptMin').checked = window.chartConfig.options.min;
     document.getElementById('dropOptMax').checked = window.chartConfig.options.max;
+    document.getElementById('dropOptAveR').checked = window.chartConfig.options.aveR;
+    document.getElementById('dropOptMinR').checked = window.chartConfig.options.minR;
+    document.getElementById('dropOptMaxR').checked = window.chartConfig.options.maxR;
     // Room Chart
 }
 
@@ -78,19 +81,21 @@ function optionUpdate(element) {
         }
         let configIndex = validOptions.indexOf(element.innerText.trim());
         let miniOpt = validOptions[configIndex].slice(5,8)+isRoomCheck;
-        console.log(`MiniOpt: ${miniOpt} | miniOptD: dropOpt${miniOpt}`)
-        window.chartConfig.options[miniOpt.toLowerCase()] = document.getElementById("dropOpt"+miniOpt).checked;
+        // console.log(`MiniOpt: ${miniOpt} | miniOptD: dropOpt${miniOpt}`)
+        window.chartConfig.options[miniOpt.charAt(0).toLowerCase() + miniOpt.slice(1)] = document.getElementById("dropOpt"+miniOpt).checked;
         // Add or remove
         let dataName = ``;
         if (canvasID == 'statsChart') {
             dataName = 'totalOnline'
+            metaIndex = 0;
             curChart = window.chart;
         } else {
             dataName = 'totalRooms'
+            metaIndex = 1;
             curChart = window.chartRooms;
         }
-        let isHidden = !(document.getElementById(isRoomCheck+"dropOpt"+miniOpt).checked);
-        curChart.data.datasets[configIndex]._meta[0].hidden = isHidden;
+        let isHidden = !(document.getElementById("dropOpt"+miniOpt).checked);
+        curChart.data.datasets[configIndex]._meta[metaIndex].hidden = isHidden;
         saveSettings(window.chartConfig);
         curChart.update();
     }
@@ -164,61 +169,132 @@ function changeDataset(canvasID, value) {
     curChart.update();
 }
 
-function generateAveMinMax(payload) {
+function generateAveMinMax(payload, method = 1) {
     let aveData = [];
     let minData = [];
     let maxData = [];
     let dmap = new Map();
-
-    payload.forEach(function(curData) {
-        let timestamp = new Date(curData.statsTime);
-        let h = timestamp.getHours();
-        let m = timestamp.getMinutes();
-        if (!dmap[h]) dmap[h]={};
-        dmap[h][m] = curData;
-    })
-    Object.getOwnPropertyNames(dmap).length
-    for (i=0; i<Object.getOwnPropertyNames(dmap).length; i++) {
-        let aveR = 0;
-        let aveO = 0;
-        let minR = 0;
-        let minO = 0;
-        let maxR = 0;
-        let maxO = 0;
-        for (j=0; j<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length; j++) {
-            a = dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]];
-            if (j == 0) {
-                minR = a.totalRooms;
-                minO = a.totalOnline;
-            }
-            aveR += a.totalRooms;
-            aveO += a.totalOnline;
-            if (minR > a.totalRooms) minR = a.totalRooms;
-            if (minO > a.totalOnline) minO = a.totalOnline;
-            if (maxR < a.totalRooms) maxR = a.totalRooms;
-            if (maxO < a.totalOnline) maxO = a.totalOnline;
-            if (j == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length - 1) {
-                aveR = Math.round(aveR / (j+1) * 2)/2;
-                aveO = Math.round(aveO / (j+1) * 2)/2;
-                t = a.statsTime;
-                time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
-                aveData.push({
-                    'totalRooms' : aveR,
-                    'totalOnline' : aveO,
-                    'statsTime' : time
-                })
-                minData.push({
-                    'totalRooms' : minR,
-                    'totalOnline' : minO,
-                    'statsTime' : time
-                })
-                maxData.push({
-                    'totalRooms' : maxR,
-                    'totalOnline' : maxO,
-                    'statsTime' : time
-                })
+    // The method will change how the dmap is created
+    // '24h' -> same
+    // 'week, month' -> group by days , hours, minutes
+    // 'alltime' -> group by months, days , hours, minutes
+    // 'alltime' in future do years too
+    if (method == 1) { 
+        payload.forEach(function(curData) {
+            let timestamp = new Date(curData.statsTime);
+            let h = timestamp.getHours();
+            let m = timestamp.getMinutes();
+            if (!dmap[h]) dmap[h]={};
+            dmap[h][m] = curData;
+        })
+        for (i=0; i<Object.getOwnPropertyNames(dmap).length; i++) {
+            let aveR = 0;
+            let aveO = 0;
+            let minR = 0;
+            let minO = 0;
+            let maxR = 0;
+            let maxO = 0;
+            for (j=0; j<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length; j++) {
+                a = dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]];
+                if (j == 0) {
+                    minR = a.totalRooms;
+                    minO = a.totalOnline;
+                }
+                aveR += a.totalRooms;
+                aveO += a.totalOnline;
+                if (minR > a.totalRooms) minR = a.totalRooms;
+                if (minO > a.totalOnline) minO = a.totalOnline;
+                if (maxR < a.totalRooms) maxR = a.totalRooms;
+                if (maxO < a.totalOnline) maxO = a.totalOnline;
+                if (j == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length - 1) {
+                    aveR = Math.round(aveR / (j+1) * 2)/2;
+                    aveO = Math.round(aveO / (j+1) * 2)/2;
+                    t = a.statsTime;
+                    time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
+                    aveData.push({
+                        'totalRooms' : aveR,
+                        'totalOnline' : aveO,
+                        'statsTime' : time
+                    })
+                    minData.push({
+                        'totalRooms' : minR,
+                        'totalOnline' : minO,
+                        'statsTime' : time
+                    })
+                    maxData.push({
+                        'totalRooms' : maxR,
+                        'totalOnline' : maxO,
+                        'statsTime' : time
+                    })
+                }
             }
         }
+    } else if (method == 2) {
+        // week, month, alltime
+        payload.forEach(function(curData) {
+            let timestamp = new Date(curData.statsTime);
+            let d = Math.floor((timestamp - new Date(timestamp.getFullYear(), 0, 0)) / 86400000); // Returns day - 1 to 365/6
+            let h = timestamp.getHours();
+            let m = timestamp.getMinutes();
+            if (!dmap[d]) dmap[d]={};
+            if (!dmap[d][h]) dmap[d][h]={};
+            dmap[d][h][m] = curData;
+        })
+        // console.log(dmap)
+        // dmap[Object.getOwnPropertyNames(dmap)[k]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]])[k]]
+        for (let ii=0; ii<Object.getOwnPropertyNames(dmap).length; ii++) {
+            // let aveR = 0;
+            // let aveO = 0;
+            let minR = 0;
+            let minO = 0;
+            let maxR = 0;
+            let maxO = 0;
+            for (let jj=0; jj<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]]).length; jj++) {
+                // debugger;
+                for (let k=0; k<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]]).length; k++) {
+                    a = dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]])[k]];
+                    // console.log(`ii: ${ii} ~ jj: ${jj} ~ k: ${k}`, a)
+                    if (jj == 0) {
+                        minR = a.totalRooms;
+                        minO = a.totalOnline;
+                    }
+                    // aveR += a.totalRooms;
+                    // aveO += a.totalOnline;
+                    if (minR > a.totalRooms) minR = a.totalRooms;
+                    if (minO > a.totalOnline) minO = a.totalOnline;
+                    if (maxR < a.totalRooms) maxR = a.totalRooms;
+                    if (maxO < a.totalOnline) maxO = a.totalOnline;
+                    // console.log(`minR: ${minR} | maxR: ${maxR} | minO: ${minO} | maxO: ${maxO}`);
+                    if (k == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]]).length - 1) {
+                        // console.log(`ii: ${ii} ~ jj: ${jj} ~ k: ${k}`)
+                        // console.log(aveR)
+                        // console.log(`aveO: ${aveO} | next: ${Math.round(aveO / ((k+1) * (jj+1)) * 2)/2} | just K: ${Math.round(aveO / (k+1) * 2)/2} ||| aveR: ${aveR} | next: ${Math.round(aveR / ((k+1) * (jj+1)) * 2)/2} | just K: ${Math.round(aveR / (k+1) * 2)/2}`)
+                        aveR = (minR + maxR) / 2
+                        aveO = (minO + maxO) / 2
+                        // aveR = Math.round(aveR / (k+1) * 2)/2;
+                        // aveO = Math.round(aveO / (k+1) * 2)/2;
+                        t = a.statsTime;
+                        time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
+                        aveData.push({
+                            'totalRooms' : aveR,
+                            'totalOnline' : aveO,
+                            'statsTime' : time
+                        })
+                        minData.push({
+                            'totalRooms' : minR,
+                            'totalOnline' : minO,
+                            'statsTime' : time
+                        })
+                        maxData.push({
+                            'totalRooms' : maxR,
+                            'totalOnline' : maxO,
+                            'statsTime' : time
+                        })
+                    }
+                }
+            }
+        }
+        // console.log([aveData, minData, maxData])
     }
     return [aveData, minData, maxData];
 }
@@ -272,6 +348,9 @@ $(document).ready(function () {
                 chart.data.datasets[0]._meta[0].hidden = !window.chartConfig.options.ave;
                 chart.data.datasets[1]._meta[0].hidden = !window.chartConfig.options.min;
                 chart.data.datasets[2]._meta[0].hidden = !window.chartConfig.options.max;
+                chartRooms.data.datasets[0]._meta[1].hidden = !window.chartConfig.options.aveR;
+                chartRooms.data.datasets[1]._meta[1].hidden = !window.chartConfig.options.minR;
+                chartRooms.data.datasets[2]._meta[1].hidden = !window.chartConfig.options.maxR;
                 changeDataset('statsChart', '24h');
                 changeDataset('roomsChart', '24h');
             }
@@ -279,7 +358,7 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/mysql?time=week',
             success: (payload) => {
-                let arrays = generateAveMinMax(payload);
+                let arrays = generateAveMinMax(payload, 2);
                 statsConfig[2] = arrays[0];
                 statsConfig[7] = arrays[1];
                 statsConfig[8] = arrays[2];
@@ -288,7 +367,7 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/mysql?time=month',
             success: (payload) => {
-                let arrays = generateAveMinMax(payload);
+                let arrays = generateAveMinMax(payload, 2);
                 statsConfig[3] = arrays[0];
                 statsConfig[9] = arrays[1];
                 statsConfig[10] = arrays[2];
@@ -297,7 +376,7 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/mysql?time=alltime',
             success: (payload) => {
-                let arrays = generateAveMinMax(payload);
+                let arrays = generateAveMinMax(payload, 2);
                 statsConfig[4] = arrays[0];
                 statsConfig[11] = arrays[1];
                 statsConfig[12] = arrays[2];
@@ -459,6 +538,9 @@ $(document).ready(function () {
                 
                 // Check for removal
                 if (window.chart.data.datasets[0].data.length >= window.chartConfig.limit) {
+                    window.chart.data.datasets[0].data = window.chart.data.datasets[0].data.slice(1);
+                }
+                if (statsConfig.length >= window.chartConfig.limit) {
                     statsConfig[0] = statsConfig[0].slice(1);
                 }
 
