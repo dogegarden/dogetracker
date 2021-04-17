@@ -70,7 +70,7 @@ class App {
 
         this.app.get('/rooms', async function (req, res) {
             try {
-                const rooms = await axios.get('https://api.dogehouse.xyz/v1/popularRooms');
+                const rooms = await axios.get('https://api.dogegarden.net/v1/popularRooms');
                 console.log(rooms.data.rooms)
                 res.render('rooms.ejs', {
                     path: req.path,
@@ -83,7 +83,7 @@ class App {
 
         // this.app.get('/scheduled', async function(req, res) {
         //     try {
-        //         const rooms = await axios.get('https://api.dogehouse.xyz/v1/scheduledRooms');
+        //         const rooms = await axios.get('https://api.dogegarden.net/v1/scheduledRooms');
         //         console.log(rooms.data.rooms)
         //         res.render('scheduled.ejs', {
         //             path: req.path,

@@ -27,7 +27,7 @@ function saveMYSQL() {
         Logger.mysql(`Connected`);
         let data;
         try {
-            data = await axios.get('https://api.dogehouse.xyz/v1/popularRooms?mysql')
+            data = await axios.get('https://api.dogegarden.net/v1/popularRooms?mysql')
             data = data.data;
             // let sql = 'INSERT IGNORE INTO users (uuid, numFollowers, displayName) VALUES ';
             // for (j = 0; j < data.rooms.length; j++) {

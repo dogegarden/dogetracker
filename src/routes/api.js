@@ -10,8 +10,8 @@ class API extends Router {
 
         this.router.get('/statistics', async (req, res) => {
             try {
-                let statistics = await axios.get('https://api.dogehouse.xyz/v1/statistics?dogestats')
-                let initRooms = await axios.get('https://api.dogehouse.xyz/v1/popularRooms?dogestats')
+                let statistics = await axios.get('https://api.dogegarden.net/v1/statistics?dogestats')
+                let initRooms = await axios.get('https://api.dogegarden.net/v1/popularRooms?dogestats')
                 let topRoom = initRooms.data.rooms[0]
 
                 let newestRoom = initRooms.data.rooms.find(rooms => rooms.inserted_at == initRooms.data.rooms.map(it => it.inserted_at).sort()[initRooms.data.rooms.length - 1])
@@ -65,7 +65,7 @@ class API extends Router {
 
         this.router.get('/bots', async (req, res) => {
             try {
-                let bots = await axios.get('https://api.dogehouse.xyz/v1/bots?dogestats')
+                let bots = await axios.get('https://api.dogegarden.net/v1/bots?dogestats')
                 res.json(bots.data);
             } catch (e) {
                 console.log(e)
