@@ -188,12 +188,12 @@ function generateAveMinMax(payload, method = 1) {
             dmap[h][m] = curData;
         })
         for (let i=0; i<Object.getOwnPropertyNames(dmap).length; i++) {
-            let aveR = 0;
-            let aveO = 0;
-            let minR = 0;
-            let minO = 0;
-            let maxR = 0;
-            let maxO = 0;
+            aveR = 0;
+            aveO = 0;
+            minR = 0;
+            minO = 0;
+            maxR = 0;
+            maxO = 0;
             for (let j=0; j<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length; j++) {
                 let a = dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]];
                 if (j == 0) {
@@ -207,10 +207,10 @@ function generateAveMinMax(payload, method = 1) {
                 if (maxR < a.totalRooms) maxR = a.totalRooms;
                 if (maxO < a.totalOnline) maxO = a.totalOnline;
                 if (j == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length - 1) {
-                    let aveR = Math.round(aveR / (j+1) * 2)/2;
-                    let aveO = Math.round(aveO / (j+1) * 2)/2;
-                    let t = a.statsTime;
-                    let time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
+                    aveR = Math.round(aveR / (j+1) * 2)/2;
+                    aveO = Math.round(aveO / (j+1) * 2)/2;
+                    t = a.statsTime;
+                    time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
                     aveData.push({
                         'totalRooms' : aveR,
                         'totalOnline' : aveO,
@@ -243,12 +243,12 @@ function generateAveMinMax(payload, method = 1) {
         // console.log(dmap)
         // dmap[Object.getOwnPropertyNames(dmap)[k]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]])[k]]
         for (let ii=0; ii<Object.getOwnPropertyNames(dmap).length; ii++) {
-            // let aveR = 0;
-            // let aveO = 0;
-            let minR = 0;
-            let minO = 0;
-            let maxR = 0;
-            let maxO = 0;
+            // aveR = 0;
+            // aveO = 0;
+            minR = 0;
+            minO = 0;
+            maxR = 0;
+            maxO = 0;
             for (let jj=0; jj<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]]).length; jj++) {
                 // debugger;
                 for (let k=0; k<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]]).length; k++) {
@@ -269,12 +269,12 @@ function generateAveMinMax(payload, method = 1) {
                         // console.log(`ii: ${ii} ~ jj: ${jj} ~ k: ${k}`)
                         // console.log(aveR)
                         // console.log(`aveO: ${aveO} | next: ${Math.round(aveO / ((k+1) * (jj+1)) * 2)/2} | just K: ${Math.round(aveO / (k+1) * 2)/2} ||| aveR: ${aveR} | next: ${Math.round(aveR / ((k+1) * (jj+1)) * 2)/2} | just K: ${Math.round(aveR / (k+1) * 2)/2}`)
-                        let aveR = (minR + maxR) / 2
-                        let aveO = (minO + maxO) / 2
+                        aveR = (minR + maxR) / 2
+                        aveO = (minO + maxO) / 2
                         // aveR = Math.round(aveR / (k+1) * 2)/2;
                         // aveO = Math.round(aveO / (k+1) * 2)/2;
-                        let t = a.statsTime;
-                        let time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
+                        t = a.statsTime;
+                        time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
                         aveData.push({
                             'totalRooms' : aveR,
                             'totalOnline' : aveO,
