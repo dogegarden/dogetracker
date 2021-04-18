@@ -24,26 +24,20 @@ function getData(timeOption) {
     if (timeOption == '24h') {
         // sql = 'SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime > DATE_SUB(CURDATE(), INTERVAL 1 DAY) and id mod 2 = 0';
         // sql = 'SET @Hours = HOUR(NOW()); SET @StartTime = DATE_SUB(CURDATE(), INTERVAL 1 DAY); SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime > DATE_ADD(@startTime, INTERVAL @Hours HOUR) AND id mod 2 = 0;'; 
-        sql = 'SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 DAY), INTERVAL HOUR(NOW()) HOUR) AND id mod 2 = 0;'; 
-        // 144 /2 = 72
-    } else if (timeOption == '24h-o') {
-        sql = 'SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime between DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 2 DAY), INTERVAL HOUR(NOW()) HOUR) AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 DAY), INTERVAL HOUR(NOW()) HOUR) AND id mod 2 = 0;'; 
+        sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d-%h") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 DAY), INTERVAL HOUR(NOW()) HOUR) GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d-%h"); '; 
     } else if (timeOption == 'week') {
-        sql = 'SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 7 DAY), INTERVAL HOUR(NOW()) HOUR) AND id mod 14 = 0';
-        // 144*7 / 14 = 72
-    } else if (timeOption == 'week-o') {
-        sql = 'SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime between DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 14 DAY), INTERVAL HOUR(NOW()) HOUR) AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 7 DAY), INTERVAL HOUR(NOW()) HOUR) AND id mod 14 = 0';
+        sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 7 DAY), INTERVAL HOUR(NOW()) HOUR) GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d"); ';
     } else if (timeOption == 'month') {
-        sql = 'SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), INTERVAL HOUR(NOW()) HOUR) AND id mod 60 = 0';
-        // 144 * 30 / 60 = 72
-    } else if (timeOption == 'month-o') {
-        sql = 'SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime between DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 2 MONTH), INTERVAL HOUR(NOW()) HOUR) AND DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), INTERVAL HOUR(NOW()) HOUR) AND id mod 60 = 0';
+        sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), INTERVAL HOUR(NOW()) HOUR) GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d"); ';
     } else {
         // All time
-        let startTime = new Date('1 Apr 2021').valueOf();
-        let days = Math.ceil((Date.now() - startTime)/1000/60/60/24)
-        sql = `SELECT totalRooms, totalOnline, statsTime FROM stats WHERE id mod ${days * 2} = 0`;
+        let daySplit = Math.ceil((Date.now()-new Date('4 Apr 2021').valueOf())/86400000/30); // /30 for number of days for modulus
+        // let days = Math.ceil((Date.now() - startTime)/1000/60/60/24)
+        // sql = `SELECT totalRooms, totalOnline, statsTime FROM stats WHERE id mod ${days * 2} = 0`;
 
+        // New version, for every 30 days increase modulus by one so, <30, 1/month, 2/month, 3/month etc. >= 30 && < 60, 2/month, 4/month, etc. 3/m, 6/m .. 4/m, 8/m
+        sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE DATE_FORMAT(statsTime, "%d") mod '+daySplit+' = 0 GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d"); ';
+        // Todo: decide between days, weeks, months, even years
     }
 
     // const result = query(sql);
