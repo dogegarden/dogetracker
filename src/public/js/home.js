@@ -105,26 +105,28 @@ function changeDataset(canvasID, value) {
     // console.log(`Canvas ${canvasID} | value ${value}`)
     let curChart;
     let lookupIndex = lookup.indexOf(value);
-    let dataName = ``;
+    let roomCheck = '';
     if (canvasID == 'statsChart') {
-        dataName = 'totalOnline'
         curChart = window.chart;
+        liveDataName = 'totalOnline';
     } else {
-        dataName = 'totalRooms'
         curChart = window.chartRooms;
+        liveDataName = 'totalRooms';
+        roomCheck = 'R';
     }
     // Update chart
     // What data do we want to update
     if (lookupIndex != -1) {
         // (new Date).toLocaleTimeString()
-        curChart.data.datasets[0].data = statsConfig[lookupIndex].map(({ [`${dataName}`]: val }) => val);
         curChart.options.scales.xAxes[0].scaleLabel.labelString = "Time";
         if (lookupIndex > 0) {
-            curChart.data.datasets[1].data = statsConfig[lookupIndex*2+3].map(({ [`${dataName}`]: val }) => val);
-            curChart.data.datasets[2].data = statsConfig[lookupIndex*2+4].map(({ [`${dataName}`]: val }) => val);
+            curChart.data.datasets[0].data = statsConfig[lookupIndex].map(({ [`ave${roomCheck}`]: val }) => val);
+            curChart.data.datasets[1].data = statsConfig[lookupIndex].map(({ [`min${roomCheck}`]: val }) => val);
+            curChart.data.datasets[2].data = statsConfig[lookupIndex].map(({ [`max${roomCheck}`]: val }) => val);
         } else {
+            curChart.data.datasets[0].data = statsConfig[lookupIndex].map(({ [liveDataName]: val }) => val);
             curChart.data.datasets[1].data = [];   
-            curChart.data.datasets[2].data = [];   
+            curChart.data.datasets[2].data = [];    
         }
     }
 
@@ -139,27 +141,28 @@ function changeDataset(canvasID, value) {
         // Consider storing this data in the background
     } else if (lookupIndex == 1) {
         // 24h
-        curChart.data.labels = statsConfig[1].map(({ [`statsTime`]: val }) => new Date(val).getHours());
+        // Slice as "2021-04-18-02" is given to get day, then add hours
+        curChart.data.labels = statsConfig[1].map(({ [`queryDay`]: val }) => new Date(val.slice(0,-3)).getHours()+parseInt(val.slice(-2)));
         curChart.options.tooltips.callbacks.title = function(t, d) {
             return "Time: "+d.labels[t[0].index]+" hours";
          }
     } else if (lookupIndex == 2) {
         // Weeks
         let days = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
-        curChart.data.labels = statsConfig[2].map(({ [`statsTime`]: val }) => days[new Date(val).getDay()]+" "+new Date(val).getHours()+":"+new Date(val).getMinutes());
+        curChart.data.labels = statsConfig[2].map(({ [`queryDay`]: val }) => days[new Date(val).getDay()]);
         curChart.options.tooltips.callbacks.title = function(t, d) {
             return "Time: "+d.labels[t[0].index];
          }
     } else if (lookupIndex == 3) {
         // Month
-        curChart.data.labels = statsConfig[3].map(({ [`statsTime`]: val }) => new Date(val).toLocaleDateString());
+        curChart.data.labels = statsConfig[3].map(({ [`queryDay`]: val }) => new Date(val).toLocaleDateString());
         curChart.options.tooltips.callbacks.title = function(t, d) {
             return "Time: "+d.labels[t[0].index];
          }
     } else if (lookupIndex == 4) {
         // All Time
         // Store start date as value and work out day, week, month, year
-        curChart.data.labels = statsConfig[4].map(({ [`statsTime`]: val }) => new Date(val).toLocaleDateString());
+        curChart.data.labels = statsConfig[4].map(({ [`queryDay`]: val }) => new Date(val).toLocaleDateString());
         curChart.options.tooltips.callbacks.title = function(t, d) {
             return "Time: "+d.labels[t[0].index];
          }
@@ -169,137 +172,14 @@ function changeDataset(canvasID, value) {
     curChart.update();
 }
 
-function generateAveMinMax(payload, method = 1) {
-    let aveData = [];
-    let minData = [];
-    let maxData = [];
-    let dmap = new Map();
-    // The method will change how the dmap is created
-    // '24h' -> same
-    // 'week, month' -> group by days , hours, minutes
-    // 'alltime' -> group by months, days , hours, minutes
-    // 'alltime' in future do years too
-    if (method == 1) { 
-        payload.forEach(function(curData) {
-            let timestamp = new Date(curData.statsTime);
-            let h = timestamp.getHours();
-            let m = timestamp.getMinutes();
-            if (!dmap[h]) dmap[h]={};
-            dmap[h][m] = curData;
-        })
-        for (let i=0; i<Object.getOwnPropertyNames(dmap).length; i++) {
-            aveR = 0;
-            aveO = 0;
-            minR = 0;
-            minO = 0;
-            maxR = 0;
-            maxO = 0;
-            for (let j=0; j<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length; j++) {
-                let a = dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]];
-                if (j == 0) {
-                    minR = a.totalRooms;
-                    minO = a.totalOnline;
-                }
-                aveR += a.totalRooms;
-                aveO += a.totalOnline;
-                if (minR > a.totalRooms) minR = a.totalRooms;
-                if (minO > a.totalOnline) minO = a.totalOnline;
-                if (maxR < a.totalRooms) maxR = a.totalRooms;
-                if (maxO < a.totalOnline) maxO = a.totalOnline;
-                if (j == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]]).length - 1) {
-                    aveR = Math.round(aveR / (j+1) * 2)/2;
-                    aveO = Math.round(aveO / (j+1) * 2)/2;
-                    t = a.statsTime;
-                    time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
-                    aveData.push({
-                        'totalRooms' : aveR,
-                        'totalOnline' : aveO,
-                        'statsTime' : time
-                    })
-                    minData.push({
-                        'totalRooms' : minR,
-                        'totalOnline' : minO,
-                        'statsTime' : time
-                    })
-                    maxData.push({
-                        'totalRooms' : maxR,
-                        'totalOnline' : maxO,
-                        'statsTime' : time
-                    })
-                }
-            }
-        }
-    } else if (method == 2) {
-        // week, month, alltime
-        payload.forEach(function(curData) {
-            let timestamp = new Date(curData.statsTime);
-            let d = Math.floor((timestamp - new Date(timestamp.getFullYear(), 0, 0)) / 86400000); // Returns day - 1 to 365/6
-            let h = timestamp.getHours();
-            let m = timestamp.getMinutes();
-            if (!dmap[d]) dmap[d]={};
-            if (!dmap[d][h]) dmap[d][h]={};
-            dmap[d][h][m] = curData;
-        })
-        // console.log(dmap)
-        // dmap[Object.getOwnPropertyNames(dmap)[k]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[i]])[j]])[k]]
-        for (let ii=0; ii<Object.getOwnPropertyNames(dmap).length; ii++) {
-            // aveR = 0;
-            // aveO = 0;
-            minR = 0;
-            minO = 0;
-            maxR = 0;
-            maxO = 0;
-            for (let jj=0; jj<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]]).length; jj++) {
-                // debugger;
-                for (let k=0; k<Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]]).length; k++) {
-                    let a = dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]])[k]];
-                    // console.log(`ii: ${ii} ~ jj: ${jj} ~ k: ${k}`, a)
-                    if (jj == 0) {
-                        minR = a.totalRooms;
-                        minO = a.totalOnline;
-                    }
-                    // aveR += a.totalRooms;
-                    // aveO += a.totalOnline;
-                    if (minR > a.totalRooms) minR = a.totalRooms;
-                    if (minO > a.totalOnline) minO = a.totalOnline;
-                    if (maxR < a.totalRooms) maxR = a.totalRooms;
-                    if (maxO < a.totalOnline) maxO = a.totalOnline;
-                    // console.log(`minR: ${minR} | maxR: ${maxR} | minO: ${minO} | maxO: ${maxO}`);
-                    if (k == Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]][Object.getOwnPropertyNames(dmap[Object.getOwnPropertyNames(dmap)[ii]])[jj]]).length - 1) {
-                        // console.log(`ii: ${ii} ~ jj: ${jj} ~ k: ${k}`)
-                        // console.log(aveR)
-                        // console.log(`aveO: ${aveO} | next: ${Math.round(aveO / ((k+1) * (jj+1)) * 2)/2} | just K: ${Math.round(aveO / (k+1) * 2)/2} ||| aveR: ${aveR} | next: ${Math.round(aveR / ((k+1) * (jj+1)) * 2)/2} | just K: ${Math.round(aveR / (k+1) * 2)/2}`)
-                        aveR = (minR + maxR) / 2
-                        aveO = (minO + maxO) / 2
-                        // aveR = Math.round(aveR / (k+1) * 2)/2;
-                        // aveO = Math.round(aveO / (k+1) * 2)/2;
-                        t = a.statsTime;
-                        time = new Date(t).getTime() - new Date(t).getMinutes()*60000 - new Date(t).getSeconds()*1000 - new Date(t).getMilliseconds();
-                        aveData.push({
-                            'totalRooms' : aveR,
-                            'totalOnline' : aveO,
-                            'statsTime' : time
-                        })
-                        minData.push({
-                            'totalRooms' : minR,
-                            'totalOnline' : minO,
-                            'statsTime' : time
-                        })
-                        maxData.push({
-                            'totalRooms' : maxR,
-                            'totalOnline' : maxO,
-                            'statsTime' : time
-                        })
-                    }
-                }
-            }
-        }
-        // console.log([aveData, minData, maxData])
-    }
-    return [aveData, minData, maxData];
-}
-
 $(document).ready(function () {
+
+    // Patreon Update
+    // Update every now and then, patreon oauth kind of a pain to work with. May change to github sponsorships
+    const users = ['Sean McGinty'];
+    const activeUser = users[Math.floor(Math.random() * users.length)]
+    $('#sponsor-main').text(activeUser);
+    $('#sponsor-sub').text(activeUser);
 
     // Load settings from localStorage
     if (localStorage) {
@@ -332,17 +212,14 @@ $(document).ready(function () {
     })
 
     // [ [ live ], [ 24h - average ], [ week - average ], [ month - average ], [ alltime - average ], [ 24h - min ], [ 24h - max ], [ week - min ], [ week - max ], [ month - min ], [ month - max ], [ alltime - min ], [ alltime - max ] ]
-    window.statsConfig = [[],[],[],[],[],[],[],[],[],[],[],[],[]];
+    // window.statsConfig = [[],[],[],[],[],[],[],[],[],[],[],[],[]];
+    window.statsConfig = [[],[],[],[],[]];
 
     function getLongTermData() {
         $.ajax({
             url: '/api/mysql?time=24h',
             success: (payload) => {
-                // console.log(payload);
-                let arrays = generateAveMinMax(payload);
-                statsConfig[1] = arrays[0];
-                statsConfig[5] = arrays[1];
-                statsConfig[6] = arrays[2];
+                statsConfig[1] = payload;
 
                 // Setup
                 chart.data.datasets[0]._meta[0].hidden = !window.chartConfig.options.ave;
@@ -358,28 +235,19 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/mysql?time=week',
             success: (payload) => {
-                let arrays = generateAveMinMax(payload, 2);
-                statsConfig[2] = arrays[0];
-                statsConfig[7] = arrays[1];
-                statsConfig[8] = arrays[2];
+                statsConfig[2] = payload;
             }
         })
         $.ajax({
             url: '/api/mysql?time=month',
             success: (payload) => {
-                let arrays = generateAveMinMax(payload, 2);
-                statsConfig[3] = arrays[0];
-                statsConfig[9] = arrays[1];
-                statsConfig[10] = arrays[2];
+                statsConfig[3] = payload;
             }
         })
         $.ajax({
             url: '/api/mysql?time=alltime',
             success: (payload) => {
-                let arrays = generateAveMinMax(payload, 2);
-                statsConfig[4] = arrays[0];
-                statsConfig[11] = arrays[1];
-                statsConfig[12] = arrays[2];
+                statsConfig[4] = payload;
             }
         })
     }
