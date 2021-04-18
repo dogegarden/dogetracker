@@ -41,26 +41,32 @@ function saveMYSQL() {
             //     if (err) throw err;
             //     console.log("users inserted");
             // });
-            sql = 'INSERT IGNORE INTO rooms (id, creatorId, roomDescription, insertedAt, roomName, numPeopleInside) VALUES ';
-            for (i = 0; i < data.rooms.length; i++) {
-                sql += `('${data.rooms[i].id}', '${data.rooms[i].creatorId}', '${data.rooms[i].description.replace(/"/g, '\\\"').replace(/'/g, '\\\'')}', '${data.rooms[i].inserted_at}', '${data.rooms[i].name.replace(/"/g, '\\\"').replace(/'/g, '\\\'')}', '${data.rooms[i].numPeopleInside}'), `;
-            }
-            sql = sql.slice(0, sql.length - 2);
+            if (data.rooms === undefined) { 
+                Logger.mysql("Rooms undefined, check API endpoint");
+            } else {
+                sql = 'INSERT IGNORE INTO rooms (id, creatorId, roomDescription, insertedAt, roomName, numPeopleInside) VALUES ';
+                for (i = 0; i < data.rooms.length; i++) {
+                    sql += `('${data.rooms[i].id}', '${data.rooms[i].creatorId}', '${data.rooms[i].description.replace(/"/g, '\\\"').replace(/'/g, '\\\'')}', '${data.rooms[i].inserted_at}', '${data.rooms[i].name.replace(/"/g, '\\\"').replace(/'/g, '\\\'')}', '${data.rooms[i].numPeopleInside}'), `;
+                }
+                sql = sql.slice(0, sql.length - 2);
 
-            con.query(sql, function (err, result) {
-                if (err) throw err;
-                console.log("rooms inserted");
-            });
+                con.query(sql, function (err, result) {
+                    if (err) throw err;
+                    Logger.mysql("Rooms inserted");
+                });
+            }
 
             data = await axios.get(process.env.HOST_URL+'api/statistics?mysql')
             data = data.data;
-            sql = `INSERT INTO stats (totalRooms, totalScheduledRooms, totalOnline, totalBotsOnline, totalBotsSendingTelemetry, topRoomID, newestRoomID, longestRoomID) VALUES (${data.totalRooms}, ${data.totalScheduled}, ${data.totalOnline}, ${data.totalBotsOnline}, ${data.totalBotsSendingTelemetry}, '${data.topRoom.id}', '${data.newestRoom.id}', '${data.longestRoom.id}')`;
-
-            con.query(sql, function (err, result) {
-                if (err) throw err;
-                console.log("stats inserted");
-            });
-
+            if (data.totalRooms === undefined) { 
+                Logger.mysql("Total Rooms undefined, check API endpoint");
+            } else {
+                sql = `INSERT INTO stats (totalRooms, totalScheduledRooms, totalOnline, totalBotsOnline, totalBotsSendingTelemetry, topRoomID, newestRoomID, longestRoomID) VALUES (${data.totalRooms}, ${data.totalScheduled}, ${data.totalOnline}, ${data.totalBotsOnline}, ${data.totalBotsSendingTelemetry}, '${data.topRoom.id}', '${data.newestRoom.id}', '${data.longestRoom.id}')`;
+                con.query(sql, function (err, result) {
+                    if (err) throw err;
+                    Logger.mysql("Stats inserted");
+                });
+            }
         } catch (e) {
             return console.error('Error in getting data from api', e)
         }
