@@ -29,7 +29,7 @@ function getData(timeOption) {
         sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 7 DAY), INTERVAL HOUR(NOW()) HOUR) GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d"); ';
     } else if (timeOption == 'month') {
         sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 MONTH), INTERVAL HOUR(NOW()) HOUR) GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d"); ';
-    } else {
+    } else if (timeOption == 'alltime') {
         // All time
         let daySplit = Math.ceil((Date.now()-new Date('4 Apr 2021').valueOf())/86400000/30); // /30 for number of days for modulus
         // let days = Math.ceil((Date.now() - startTime)/1000/60/60/24)
@@ -38,6 +38,8 @@ function getData(timeOption) {
         // New version, for every 30 days increase modulus by one so, <30, 1/month, 2/month, 3/month etc. >= 30 && < 60, 2/month, 4/month, etc. 3/m, 6/m .. 4/m, 8/m
         sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE DATE_FORMAT(statsTime, "%d") mod '+daySplit+' = 0 GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d"); ';
         // Todo: decide between days, weeks, months, even years
+    } else {
+        sql = 'SELECT * FROM stats; ';
     }
 
     // const result = query(sql);
