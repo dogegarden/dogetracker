@@ -74,7 +74,7 @@ class API extends Router {
 
         this.router.get('/mysql', async (req, res) => {
             // console.log(req.query.time)
-            let validQueries = ['24h', '24h-o', 'week', 'week-o', 'month', 'month-o', 'alltime'];
+            let validQueries = ['24h', 'week', 'month', 'alltime', 'custom'];
             if (validQueries.indexOf(req.query.time) != -1) {
 
                 try {
