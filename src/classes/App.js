@@ -71,10 +71,10 @@ class App {
         this.app.get('/rooms', async function (req, res) {
             try {
                 const rooms = await axios.get('https://api.dogegarden.net/v1/popularRooms');
-                console.log(rooms.data.rooms)
+                console.log(rooms.data.rooms.rooms)
                 res.render('rooms.ejs', {
                     path: req.path,
-                    rooms: rooms.data.rooms
+                    rooms: rooms.data.rooms.rooms
                 })
             } catch (err) {
                 console.log(err)

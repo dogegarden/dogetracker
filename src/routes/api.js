@@ -12,10 +12,10 @@ class API extends Router {
             try {
                 let statistics = await axios.get('https://api.dogegarden.net/v1/statistics?dogestats')
                 let initRooms = await axios.get('https://api.dogegarden.net/v1/popularRooms?dogestats')
-                let topRoom = initRooms.data.rooms[0]
+                let topRoom = initRooms.data.rooms.rooms[0]
 
-                let newestRoom = initRooms.data.rooms.find(rooms => rooms.inserted_at == initRooms.data.rooms.map(it => it.inserted_at).sort()[initRooms.data.rooms.length - 1])
-                let longestRoom = initRooms.data.rooms.find(rooms => rooms.inserted_at == initRooms.data.rooms.map(it => it.inserted_at).sort()[0])
+                let newestRoom = initRooms.data.rooms.rooms.find(rooms => rooms.inserted_at == initRooms.data.rooms.rooms.map(it => it.inserted_at).sort()[initRooms.data.rooms.rooms.length - 1])
+                let longestRoom = initRooms.data.rooms.rooms.find(rooms => rooms.inserted_at == initRooms.data.rooms.rooms.map(it => it.inserted_at).sort()[0])
                 let serverTime = new Date().valueOf();
                 let data = {
                     totalRooms: statistics.data.totalRooms,
