@@ -56,7 +56,7 @@ function saveMYSQL() {
                 });
             }
 
-            data = await axios.get(process.env.HOST_URL+'api/statistics?mysql')
+            data = await axios.get('https://stats.dogegarden.net/api/statistics?mysql')
             data = data.data;
             if (data.totalRooms === undefined) { 
                 Logger.mysql("Total Rooms undefined, check API endpoint");
