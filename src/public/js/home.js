@@ -142,7 +142,7 @@ function changeDataset(canvasID, value) {
     } else if (lookupIndex == 1) {
         // 24h
         // Slice as "2021-04-18-02" is given to get day, then add hours
-        curChart.data.labels = statsConfig[1].map(({ [`queryDay`]: val }) => new Date(val.slice(0,-3)).getHours()+parseInt(val.slice(-2)));
+        curChart.data.labels = statsConfig[1].map(({ [`queryDay`]: val }) => parseInt(val.slice(-2)));
         curChart.options.tooltips.callbacks.title = function(t, d) {
             return "Time: "+d.labels[t[0].index]+" hours";
          }
