@@ -491,7 +491,7 @@ $(document).ready(function () {
         $.ajax({
             url: '/api/bots',
             success: (payload) => {
-            if (payload.bots != undefined && payload.bots != null) {
+            if (payload.bots != undefined) {
                 // console.log(payload)
                 let uniqueBots = [];
                 for (let i = 0; i < payload.bots.length; i++) {
