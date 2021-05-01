@@ -24,7 +24,7 @@ function getData(timeOption) {
     if (timeOption == '24h') {
         // sql = 'SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime > DATE_SUB(CURDATE(), INTERVAL 1 DAY) and id mod 2 = 0';
         // sql = 'SET @Hours = HOUR(NOW()); SET @StartTime = DATE_SUB(CURDATE(), INTERVAL 1 DAY); SELECT totalRooms, totalOnline, statsTime FROM stats WHERE statsTime > DATE_ADD(@startTime, INTERVAL @Hours HOUR) AND id mod 2 = 0;'; 
-        sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d-%h") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 DAY), INTERVAL HOUR(NOW()) HOUR) GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d-%h"); '; 
+        sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d-%H") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 1 DAY), INTERVAL HOUR(NOW()) HOUR) GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d-%H"); '; 
     } else if (timeOption == 'week') {
         sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE statsTime > DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 7 DAY), INTERVAL HOUR(NOW()) HOUR) GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d"); ';
     } else if (timeOption == 'month') {
