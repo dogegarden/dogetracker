@@ -10,7 +10,24 @@ window.onload = function () {
     var loadTime = window.performance.timing.domContentLoadedEventEnd-window.performance.timing.navigationStart; 
     console.log('Page load time is '+ loadTime);
     document.getElementById('loadTime').innerHTML = '<i class="fas fa-stopwatch"></i> ' + loadTime + 'ms';
-
+    // Set start date for client
+    if (window.chartConfig == undefined) {
+        window.chartConfig = {
+            'start': new Date().valueOf(),
+            'step': 0,
+            'limit': 100,
+            'version' : globalVersion,
+            'options' : {
+                'ave' : true,
+                'min' : false,
+                'max' : false,
+                'aveR' : true,
+                'minR' : false,
+                'maxR' : false
+            }
+        }
+    };
+    saveSettings(window.chartConfig);
 }
 
 function compare(previousVersion, currentVersion){
@@ -373,24 +390,6 @@ $(document).ready(function () {
                 getStatus(document.getElementById('newestTimeOnline'), payload.newestRoom.created_at)
                 getStatus(document.getElementById('longestTimeOnline'), payload.longestRoom.created_at)
 
-                // Set start date for client
-                if (window.chartConfig == undefined) {
-                    window.chartConfig = {
-                        'start': new Date().valueOf(),
-                        'step': 0,
-                        'limit': 100,
-                        'version' : globalVersion,
-                        'options' : {
-                            'ave' : true,
-                            'min' : false,
-                            'max' : false,
-                            'aveR' : true,
-                            'minR' : false,
-                            'maxR' : false
-                        }
-                    }
-                };
-                saveSettings(window.chartConfig);
                 // Read settings
                 readDropDownSettings();
 
