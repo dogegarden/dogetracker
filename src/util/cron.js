@@ -45,8 +45,8 @@ function saveMYSQL() {
                 Logger.mysql("Rooms undefined, check API endpoint");
             } else {
                 sql = 'INSERT IGNORE INTO rooms (id, creatorId, roomDescription, insertedAt, roomName, numPeopleInside) VALUES ';
-                for (i = 0; i < data.rooms.rooms.length; i++) {
-                    sql += `('${data.rooms.rooms[i].id}', '${data.rooms.rooms[i].creatorId}', '${data.rooms.rooms[i].description.replace(/"/g, '\\\"').replace(/'/g, '\\\'')}', '${data.rooms.rooms[i].inserted_at}', '${data.rooms.rooms[i].name.replace(/"/g, '\\\"').replace(/'/g, '\\\'')}', '${data.rooms.rooms[i].numPeopleInside}'), `;
+                for (i = 0; i < data.rooms.length; i++) {
+                    sql += `('${data.rooms[i].id}', '${data.rooms[i].creatorId}', '${data.rooms[i].description.replace(/"/g, '\\\"').replace(/'/g, '\\\'')}', '${data.rooms[i].inserted_at}', '${data.rooms[i].name.replace(/"/g, '\\\"').replace(/'/g, '\\\'')}', '${data.rooms[i].numPeopleInside}'), `;
                 }
                 sql = sql.slice(0, sql.length - 2);
 
