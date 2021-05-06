@@ -216,12 +216,14 @@ $(document).ready(function () {
                 if (localStorage) {
                     if (savedExploitSettings != null) {
                         // Check version
-                        if (window.chartConfig.version != globalVersion) {
-                            // Show message to update / reload page.
-                            // location.reload(true);
-                            updateType = compare(window.chartConfig.version, globalVersion);
-                            console.log(`Latest Version: ${globalVersion} | Current Version: ${window.chartConfig.version} | UpdateType: ${updateType}`);
-                            document.getElementById("ver-alert").classList.remove("show");
+                        if (window.chartConfig != null) {
+                            if (window.chartConfig.version != globalVersion) {
+                                // Show message to update / reload page.
+                                // location.reload(true);
+                                updateType = compare(window.chartConfig.version, globalVersion);
+                                console.log(`Latest Version: ${globalVersion} | Current Version: ${window.chartConfig.version} | UpdateType: ${updateType}`);
+                                document.getElementById("ver-alert").classList.remove("show");
+                            }
                         }
                     }
                 }
