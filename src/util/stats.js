@@ -36,7 +36,7 @@ function getData(timeOption) {
         // sql = `SELECT totalRooms, totalOnline, statsTime FROM stats WHERE id mod ${days * 2} = 0`;
 
         // New version, for every 30 days increase modulus by one so, <30, 1/month, 2/month, 3/month etc. >= 30 && < 60, 2/month, 4/month, etc. 3/m, 6/m .. 4/m, 8/m
-        sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats WHERE DATE_FORMAT(statsTime, "%d") mod '+daySplit+' = 0 GROUP BY DATE_FORMAT(statsTime, "%Y-%m-%d"); ';
+        sql = 'SELECT DATE_FORMAT(statsTime, "%Y-%m-%d") as queryDay, avg(totalOnline) as ave, min(totalOnline) as min, max(totalOnline) as max, avg(totalRooms) as aveR, min(totalRooms) as minR, max(totalRooms) as maxR FROM stats GROUP BY CONCAT(DATE_FORMAT(statsTime, "%Y-%m-"), (DATE_FORMAT(statsTime, "%d") - DATE_FORMAT(statsTime, "%d") mod '+daySplit+')) ORDER BY queryDay ASC; ';
         // Todo: decide between days, weeks, months, even years
     } else {
         sql = 'SELECT * FROM stats; ';
