@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS stats (
      totalOnline INT(11) NOT NULL DEFAULT 0,
      totalBotsOnline INT(11) NOT NULL DEFAULT 0,
      totalBotsSendingTelemetry INT(11) NOT NULL DEFAULT 0,
+     totalRegistered INT(11) NOT NULL DEFAULT 0,
+     activeInLastTwoDays INT(11) NOT NULL DEFAULT 0,
      topRoomID VARCHAR(36),
      newestRoomID VARCHAR(36),
      longestRoomID VARCHAR(36),

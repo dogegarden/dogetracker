@@ -61,7 +61,7 @@ function saveMYSQL() {
             if (data.totalRooms === undefined) { 
                 Logger.mysql("Total Rooms undefined, check API endpoint");
             } else {
-                sql = `INSERT INTO stats (totalRooms, totalScheduledRooms, totalOnline, totalBotsOnline, totalBotsSendingTelemetry, topRoomID, newestRoomID, longestRoomID) VALUES (${data.totalRooms}, ${data.totalScheduled}, ${data.totalOnline}, ${data.totalBotsOnline}, ${data.totalBotsSendingTelemetry}, '${data.topRoom.id}', '${data.newestRoom.id}', '${data.longestRoom.id}')`;
+                sql = `INSERT INTO stats (totalRooms, totalScheduledRooms, totalOnline, totalBotsOnline, totalBotsSendingTelemetry, totalRegistered, activeInLastTwoDays, topRoomID, newestRoomID, longestRoomID) VALUES (${data.totalRooms}, ${data.totalScheduled}, ${data.totalOnline}, ${data.totalBotsOnline}, ${data.totalBotsSendingTelemetry}, ${data.totalRegistered}, ${data.activeInLastTwoDays}, '${data.topRoom.id}', '${data.newestRoom.id}', '${data.longestRoom.id}')`;
                 con.query(sql, function (err, result) {
                     if (err) throw err;
                     Logger.mysql("Stats inserted");
