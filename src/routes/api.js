@@ -44,6 +44,8 @@ class API extends Router {
                     },
                     totalBotsOnline: statistics.data.totalBotsOnline,
                     totalBotsSendingTelemetry: statistics.data.totalBotsSendingTelemetry,
+                    totalRegistered: statistics.totalRegistered,
+                    activeInLastTwoDays: statistics.activeInLastTwoDays,
                     id: statistics.data.pid,
                     serverTime: serverTime
                 }
